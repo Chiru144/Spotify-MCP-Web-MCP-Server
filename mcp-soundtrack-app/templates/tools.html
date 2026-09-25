@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spotify Advanced Tools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-dark: #090c10;
+      --bg-card: rgba(18, 24, 34, 0.75);
+      --bg-surface: #101722;
+      --spotify-green: #1db954;
+      --spotify-green-hover: #1ed760;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      padding: 32px;
+      line-height: 1.5;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 20px;
+    }
+    header h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+    }
+    .back-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .back-btn:hover { color: #fff; }
+
+    .tool-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .tool-section h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    .tool-section p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    input[type="text"] {
+      flex: 1;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      color: #fff;
+      font-family: inherit;
+    }
+    button {
+      background: linear-gradient(135deg, var(--spotify-green), #16a34a);
+      color: #000;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 12px 24px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(29, 185, 84, 0.4);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .results-area {
+      margin-top: 20px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      padding: 16px;
+      display: none;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .track-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .track-item img {
+      width: 40px; height: 40px; border-radius: 4px; object-fit: cover;
+    }
+    .track-info h4 { font-size: 14px; margin-bottom: 2px; }
+    .track-info p { font-size: 12px; color: var(--text-muted); margin: 0; }
+
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { background: rgba(18,24,34,0.95); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px 16px; border-radius: 12px; font-size: 13px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Spotify Advanced Tools</h1>
+      <a href="/" class="back-btn">← Back to Soundtrack Curator</a>
+    </header>
+
+    <div class="tool-section">
+      <h2>🔀 Playlist Shuffler (To New Playlist)</h2>
+      <p>Enter a Spotify Playlist URL or ID. We will mix its songs and save them to a completely new playlist with the same name.</p>
+      <div class="input-group" style="flex-direction: column;">
+        <select id="myPlaylistsShuffle" onchange="if(this.value) document.getElementById('shuffleInput').value = this.value;" style="padding: 12px 16px; background: var(--bg-surface); color: #fff; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); font-family: inherit; width: 100%; outline: none; box-sizing: border-box;">
+          <option value="">-- Choose Your Playlist --</option>
+        </select>
+        <div style="display: flex; width: 100%; gap: 12px; align-items: center;">
+            <div style="flex: 1; border-top: 1px solid var(--border-subtle);"></div>
+            <span style="color: var(--text-muted); font-size: 12px; text-transform: uppercase;">OR paste a link</span>
+            <div style="flex: 1; border-top: 1px solid var(--border-subtle);"></div>
+        </div>
+        <input type="text" id="shuffleInput" placeholder="e.g. spotify:playlist:37i9dQZF1DXcBWIGoYBM5M" style="width: 100%; box-sizing: border-box;" />
+        <input type="text" id="newPlaylistName" placeholder="New Playlist Name (leave blank for default)" style="width: 100%; box-sizing: border-box; margin-top: 8px;" />
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px; width: 100%;">
+          <button id="shuffleNewBtn" onclick="shufflePlaylist(false)" style="width: 100%;">Create New Shuffled Playlist</button>
+          <button id="shuffleInPlaceBtn" onclick="shufflePlaylist(true)" style="width: 100%;">Shuffle In-Place (Owner Only)</button>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <div class="tool-section">
+      <h2>🧹 Playlist Duplicate Remover</h2>
+      <p>Select a playlist or paste a link. We will scan for songs with the exact same name and artist and remove duplicates in-place.</p>
+      <div class="input-group" style="flex-direction: column;">
+        <select id="dedupePlaylistsSelect" onchange="if(this.value) document.getElementById('dedupeInput').value = this.value;" style="padding: 12px 16px; background: var(--bg-surface); color: #fff; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); font-family: inherit; width: 100%; outline: none; box-sizing: border-box;">
+          <option value="">-- Choose Your Playlist --</option>
+        </select>
+        <div style="display: flex; width: 100%; gap: 12px; align-items: center;">
+            <div style="flex: 1; border-top: 1px solid var(--border-subtle);"></div>
+            <span style="color: var(--text-muted); font-size: 12px; text-transform: uppercase;">OR paste a link</span>
+            <div style="flex: 1; border-top: 1px solid var(--border-subtle);"></div>
+        </div>
+        <input type="text" id="dedupeInput" placeholder="e.g. spotify:playlist:..." style="width: 100%; box-sizing: border-box;" />
+        <button id="dedupeBtn" onclick="removeDuplicates()" style="width: 100%; margin-top: 4px;">Remove Duplicates</button>
+      </div>
+    </div>
+
+
+    <div class="tool-section">
+      <h2>🔗 Playlist Combiner</h2>
+      <p>Combine multiple playlists into a brand new one. Add as many rows as you need, then pick your playlists or paste links!</p>
+      
+      <template id="combineRowTemplate">
+        <div class="combine-row" style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <select class="combine-select" onchange="this.nextElementSibling.value = this.value" style="padding: 12px; background: var(--bg-surface); color: #fff; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); font-family: inherit; width: 40%; outline: none; box-sizing: border-box;">
+            <option value="">-- Choose Playlist --</option>
+          </select>
+          <input type="text" class="combine-input" placeholder="OR paste link here..." style="flex: 1; box-sizing: border-box;" />
+          <button type="button" onclick="if(document.querySelectorAll('.combine-row').length > 2) this.parentElement.remove()" style="padding: 0 16px; background: transparent; color: #ef4444; border: 1px solid var(--border-subtle);">X</button>
+        </div>
+      </template>
+
+      <div class="input-group" style="flex-direction: column;">
+        <div id="combineRowsContainer">
+          <!-- Rows injected via JS -->
+        </div>
+        <button type="button" onclick="addCombineRow()" style="background: transparent; border: 1px dashed var(--border-subtle); color: var(--text-muted); margin-bottom: 12px; padding: 8px;">+ Add Another Playlist</button>
+        
+        <div style="border-top: 1px solid var(--border-subtle); margin: 8px 0; width: 100%;"></div>
+        
+        <input type="text" id="combinePlaylistName" placeholder="New Combined Playlist Name (leave blank for default)" style="width: 100%; box-sizing: border-box;" />
+        <button id="combineBtn" onclick="combinePlaylists()" style="width: 100%; margin-top: 12px;">Combine Playlists</button>
+      </div>
+    </div>
+
+
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script>
+    function showToast(msg) {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.innerHTML = `<span>✨</span><span>${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => { t.style.opacity = 0; setTimeout(() => t.remove(), 300); }, 4000);
+    }
+
+    async function shufflePlaylist(inPlace = false) {
+      const input = document.getElementById('shuffleInput').value.trim();
+      const newName = document.getElementById('newPlaylistName').value.trim();
+      if (!input) return alert('Enter a playlist ID or URL');
+      
+      const inPlaceBtn = document.getElementById('shuffleInPlaceBtn');
+      const newBtn = document.getElementById('shuffleNewBtn');
+      const activeBtn = inPlace ? inPlaceBtn : newBtn;
+      const originalText = activeBtn.textContent;
+      
+      inPlaceBtn.disabled = true;
+      newBtn.disabled = true;
+      activeBtn.textContent = 'Shuffling...';
+      
+      try {
+        const res = await fetch('/api/playlist/shuffle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ playlist_id: input, in_place: inPlace, new_name: newName || null })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message);
+          document.getElementById('shuffleInput').value = '';
+          loadUserPlaylists();
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+      } finally {
+        activeBtn.textContent = originalText;
+        inPlaceBtn.disabled = false;
+        newBtn.disabled = false;
+      }
+    }
+
+
+
+    let userPlaylistOptionsHTML = '';
+
+    function addCombineRow() {
+      const container = document.getElementById('combineRowsContainer');
+      const tpl = document.getElementById('combineRowTemplate');
+      const clone = tpl.content.cloneNode(true);
+      const select = clone.querySelector('.combine-select');
+      select.innerHTML += userPlaylistOptionsHTML;
+      container.appendChild(clone);
+    }
+
+    async function combinePlaylists() {
+      const inputs = document.querySelectorAll('.combine-input');
+      const allPlaylistIds = Array.from(inputs).map(inp => inp.value.trim()).filter(v => v.length > 0);
+      
+      const newName = document.getElementById('combinePlaylistName').value.trim();
+      
+      if (allPlaylistIds.length < 2) return alert('Please enter at least 2 playlists to combine.');
+      
+      const btn = document.getElementById('combineBtn');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Combining...';
+      
+      try {
+        const res = await fetch('/api/playlist/combine', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ playlist_ids: allPlaylistIds, new_name: newName || 'Combined Playlist' })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message);
+          document.getElementById('combineRowsContainer').innerHTML = '';
+          addCombineRow(); addCombineRow(); // Reset to 2 empty rows
+          document.getElementById('combinePlaylistName').value = '';
+          loadUserPlaylists();
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+      } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    async function removeDuplicates() {
+      const input = document.getElementById('dedupeInput').value.trim();
+      if (!input) return alert('Enter a playlist ID or URL');
+      const btn = document.getElementById('dedupeBtn');
+      btn.textContent = 'Scanning...'; btn.disabled = true;
+      
+      try {
+        const res = await fetch('/api/playlist/dedupe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ playlist_id: input })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message);
+          document.getElementById('dedupeInput').value = '';
+          loadUserPlaylists();
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+      } finally {
+        btn.textContent = 'Remove Duplicates'; btn.disabled = false;
+      }
+    }
+
+
+    async function loadUserPlaylists() {
+      try {
+        const res = await fetch('/api/user/playlists');
+        const data = await res.json();
+        if (data.authenticated && data.playlists) {
+          const shuffleSelect = document.getElementById('myPlaylistsShuffle');
+          const dedupeSelect = document.getElementById('dedupePlaylistsSelect');
+          
+          shuffleSelect.innerHTML = '<option value="">-- Choose Your Playlist --</option>';
+          if (dedupeSelect) dedupeSelect.innerHTML = '<option value="">-- Choose Your Playlist --</option>';
+          userPlaylistOptionsHTML = '';
+          
+          data.playlists.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.uri;
+            const safeName = String(p.name).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            opt.innerHTML = `${safeName} (${p.total_tracks} songs)`;
+            
+            shuffleSelect.appendChild(opt.cloneNode(true));
+            if (dedupeSelect) dedupeSelect.appendChild(opt.cloneNode(true));
+            userPlaylistOptionsHTML += opt.outerHTML;
+          });
+          
+          // If no combine rows exist yet, add 2 by default
+          const container = document.getElementById('combineRowsContainer');
+          if (container && container.children.length === 0) {
+             addCombineRow(); addCombineRow();
+          } else if (container) {
+             // Update existing selects with new options
+             container.querySelectorAll('.combine-select').forEach(sel => {
+                const currentVal = sel.value;
+                sel.innerHTML = '<option value="">-- Choose Playlist --</option>' + userPlaylistOptionsHTML;
+                sel.value = currentVal;
+             });
+          }
+        }
+      } catch (e) {
+        console.warn('Could not load user playlists:', e);
+      }
+    }
+    window.addEventListener('load', loadUserPlaylists);
+  </script>
+</body>
+</html>

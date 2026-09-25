@@ -1,0 +1,9 @@
+fastapi>=0.115.0
+uvicorn>=0.30.0
+fastmcp>=4.0.0
+spotipy>=2.26.0
+python-dotenv>=1.0.0
+requests>=2.32.0
+beautifulsoup4>=4.13.0
+duckduckgo-search>=8.0.0
+ddgs>=9.0.0
