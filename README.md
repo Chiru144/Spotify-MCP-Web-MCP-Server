@@ -2,6 +2,16 @@
 
 This repository contains a FastMCP application that integrates Spotify and TMDB (The Movie Database). It allows you to build custom soundtracks and interact with a web-based Soundtrack Curator & Staging Studio.
 
+## Features
+
+- **Full Playback Control**: Play, pause, skip tracks, adjust volume, and manage your queue directly through chat.
+- **Playlist Management**: Create new playlists, add songs, shuffle, combine multiple playlists, and remove duplicates.
+- **Search & Library Access**: Search for tracks, albums, artists, or playlists on Spotify, and access your saved playlists.
+- **Personal Listening Insights**: Retrieve your top played songs across different time periods (short, medium, or long term).
+- **TMDB Movie & Actor Search**: Look up rich biographical profiles for actors or get release details, overviews, and ratings for movies directly from The Movie Database.
+- **Soundtrack Curator**: Integrated with TMDB and DuckDuckGo to automatically discover an actor's filmography, find the corresponding soundtracks, and build a dedicated Spotify playlist.
+- **Soundtrack Staging Studio**: A local web interface to visualize and manage your curated soundtracks.
+
 ## Prerequisites
 
 Before running the application, make sure you have the following installed:
