@@ -77,7 +77,11 @@ Make sure to replace `your_*` placeholders with the actual keys from your develo
 
 ## Running the Application
 
-Start the MCP server and background web app by running:
+There are two entry points to run the server, depending on your use case:
+
+### 1. `server.py` (Development & Web App Focus)
+
+Start the MCP server and background web app simultaneously by running:
 
 ```bash
 python server.py
@@ -85,6 +89,23 @@ python server.py
 
 The application will start, and the web interface should automatically open in your default browser at `http://127.0.0.1:8000`.
 
+### 2. `mcp.py` (MCP Client Integration Focus)
+
+If you are running this project as a tool inside an MCP host (like Cursor, VSCode, or Claude Desktop), you should use `mcp.py`:
+
+```bash
+python mcp.py
+```
+
+**Why `mcp.py`?** Standard MCP uses standard input/output (`stdio`) for communication. When Spotify requires you to log in for the first time, it normally pauses and asks you to paste a redirect URL in the terminal. This breaks the MCP protocol. `mcp.py` solves this by launching a **Tkinter GUI popup** for the Spotify authentication process, ensuring `stdio` remains clean and unblocked for the MCP client.
+
+## API Limits
+
+Please keep in mind the rate limits imposed by the external APIs used in this project:
+
+- **Spotify Web API**: Spotify uses a dynamic rate limit based on a rolling window. If you make too many requests in a short period (such as aggressively searching or curating massive playlists), you will receive a `429 Too Many Requests` response. The app may need to back off and try again later.
+- **TMDB API**: The Movie Database allows up to **50 requests per second**. This is generally quite generous for normal usage, but batch queries or rapid concurrent lookups could potentially hit this limit.
+
 ## MCP Integration
 
-This project is built using `fastmcp`. Once running, it can be consumed by other MCP clients. 
+This project is built using `fastmcp`. Once running via `stdio` (or SSE if configured), it can be seamlessly consumed by other MCP clients.
