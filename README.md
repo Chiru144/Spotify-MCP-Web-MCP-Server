@@ -2,6 +2,12 @@
 
 This repository contains a FastMCP application that integrates Spotify and TMDB (The Movie Database). It allows you to build custom soundtracks and interact with a web-based Soundtrack Curator & Staging Studio.
 
+## Highlights
+
+- **Cross-Domain Media Blending**: Bridges cinema and music by letting your AI dynamically look up movies, cast, or crew on TMDB and map them into custom Spotify playlists.
+- **Dual Web & Agent Design**: Built on FastAPI/Uvicorn, it functions as both a flexible web endpoint and an MCP server, supporting remote hosting and multiple networked AI connections.
+- **Pythonic Customizability**: A clean FastAPI backend makes it easy to write and extend custom logic (like multi-step prompt workflows) without relying on wrappers.
+
 ## Features
 
 - **Full Playback Control**: Play, pause, skip tracks, adjust volume, and manage your queue directly through chat.
