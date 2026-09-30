@@ -1,5 +1,7 @@
 # Spotify & TMDB Web MCP Server
 
+[![M8ven Score](https://m8ven.ai/badge/mcp/chiru144-spotify-mcp-web-mcp-server-xbliwe)](https://m8ven.ai/mcp/chiru144-spotify-mcp-web-mcp-server-xbliwe)
+
 This repository contains a FastMCP application that integrates Spotify and TMDB (The Movie Database). It allows you to build custom soundtracks and interact with a web-based Soundtrack Curator & Staging Studio.
 
 ## Highlights
