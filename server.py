@@ -17,6 +17,7 @@ if '' in sys.path:
     sys.path.remove('')
 
 from mcp.server.mcpserver import MCPServer as FastMCP
+from mcp.types import ToolAnnotations
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
@@ -553,7 +554,7 @@ def fetch_tracks_for_movie(sp: spotipy.Spotify, movie_name: str, max_songs: int 
 # Actor, Movie & Search FastMCP Tools
 # =====================================================================
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def search_actor_movies(actor_name: str, limit: int = 30, sort_by: str = "popularity") -> str:
     """Discover the full filmography for an actor using TMDB (with DDG and Wikipedia fallbacks).
     
@@ -589,7 +590,7 @@ def search_actor_movies(actor_name: str, limit: int = 30, sort_by: str = "popula
         return f"Error searching movies for {actor_name}: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def get_actor_tmdb_profile(actor_name: str) -> str:
     """Get rich biographical and career profile details for an actor from TMDB.
     
@@ -626,7 +627,7 @@ def get_actor_tmdb_profile(actor_name: str) -> str:
         return f"Error retrieving TMDB profile for {actor_name}: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def search_movie_tmdb(movie_name: str, limit: int = 5) -> str:
     """Search TMDB for movie information, release year, ratings, and overview.
     
@@ -657,7 +658,7 @@ def search_movie_tmdb(movie_name: str, limit: int = 5) -> str:
         return f"Error searching TMDB for movie '{movie_name}': {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def search_duckduckgo(query: str, max_results: int = 5) -> str:
     """Perform a web search using DuckDuckGo to look up movie news, filmographies, or sound tracks.
     
@@ -680,7 +681,7 @@ def search_duckduckgo(query: str, max_results: int = 5) -> str:
         return f"Error searching DuckDuckGo: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def get_movie_songs(movie_name: str, limit: int = 10) -> str:
     """Search Spotify for soundtrack albums and songs from a movie with DuckDuckGo fallback assistance.
     
@@ -703,7 +704,7 @@ def get_movie_songs(movie_name: str, limit: int = 10) -> str:
         return f"Error retrieving songs for movie '{movie_name}': {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def create_actor_playlist(
     actor_name: str,
     playlist_name: Optional[str] = None,
@@ -795,7 +796,7 @@ def create_actor_playlist(
 # Spotify Playlist & Playback Management Tools
 # =====================================================================
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def create_playlist(name: str, description: str = "", public: bool = True) -> str:
     """Create a new Spotify playlist for the user.
     
@@ -817,7 +818,7 @@ def create_playlist(name: str, description: str = "", public: bool = True) -> st
         return f"Error creating playlist: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def shuffle_playlist(playlist_id: str) -> str:
     """Mix and shuffle all songs in a Spotify playlist into a completely new random order.
     
@@ -862,7 +863,7 @@ def shuffle_playlist(playlist_id: str) -> str:
         return f"Error shuffling playlist: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def add_tracks_to_playlist(playlist_id: str, track_uris: List[str]) -> str:
     """Add a list of Spotify song URIs to an existing playlist.
     
@@ -882,7 +883,7 @@ def add_tracks_to_playlist(playlist_id: str, track_uris: List[str]) -> str:
     except Exception as e:
         return f"Error adding songs to playlist: {str(e)}"
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def combine_playlists(playlist_ids: List[str], new_name: str = "Combined Playlist", description: str = "Combined playlist from multiple sources.") -> str:
     """Combines multiple Spotify playlists into a single new playlist.
     
@@ -931,7 +932,7 @@ def combine_playlists(playlist_ids: List[str], new_name: str = "Combined Playlis
     except Exception as e:
         return f"Error combining playlists: {str(e)}"
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=True, idempotent_hint=True, open_world_hint=True))
 def dedupe_playlist(playlist_id: str) -> str:
     """Removes all duplicate songs from a Spotify playlist, keeping only the first occurrence of each song.
     
@@ -986,7 +987,7 @@ def dedupe_playlist(playlist_id: str) -> str:
         return f"Error deduplicating playlist: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def add_songs_to_playlist(playlist_id: str, song_uris: List[str]) -> str:
     """Add a list of Spotify song URIs to an existing playlist.
     
@@ -997,7 +998,7 @@ def add_songs_to_playlist(playlist_id: str, song_uris: List[str]) -> str:
     return add_tracks_to_playlist(playlist_id, song_uris)
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def add_movie_songs_to_playlist(playlist_id: str, movie_name: str, max_songs: int = 5) -> str:
     """Find songs for a specific movie on Spotify and add them directly to an existing playlist.
     
@@ -1021,7 +1022,7 @@ def add_movie_songs_to_playlist(playlist_id: str, movie_name: str, max_songs: in
         return f"Error adding movie songs to playlist: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def get_current_playback() -> str:
     """Get information about the user's current playback state, active song, and active device."""
     try:
@@ -1056,7 +1057,7 @@ def get_current_playback() -> str:
         return f"Error fetching current playback: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def play_track(uri: Optional[str] = None, context_uri: Optional[str] = None) -> str:
     """Resume playback or play a specific song/album/playlist by URI.
     
@@ -1079,13 +1080,13 @@ def play_track(uri: Optional[str] = None, context_uri: Optional[str] = None) -> 
         return f"Error playing: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def play_song(uri: Optional[str] = None, context_uri: Optional[str] = None) -> str:
     """Resume playback or play a specific song/album/playlist by URI."""
     return play_track(uri=uri, context_uri=context_uri)
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def pause_playback() -> str:
     """Pause the current Spotify playback."""
     try:
@@ -1096,7 +1097,7 @@ def pause_playback() -> str:
         return f"Error pausing playback: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def next_track() -> str:
     """Skip to the next song in the queue."""
     try:
@@ -1107,13 +1108,13 @@ def next_track() -> str:
         return f"Error skipping to next song: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def next_song() -> str:
     """Skip to the next song in the queue."""
     return next_track()
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def previous_track() -> str:
     """Skip to the previous song."""
     try:
@@ -1124,13 +1125,13 @@ def previous_track() -> str:
         return f"Error skipping to previous song: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def previous_song() -> str:
     """Skip to the previous song."""
     return previous_track()
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def set_volume(volume_percent: int) -> str:
     """Set the playback volume.
     
@@ -1147,7 +1148,7 @@ def set_volume(volume_percent: int) -> str:
         return f"Error setting volume: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def search_spotify(query: str, search_type: str = "track", limit: int = 5) -> str:
     """Search for songs, albums, artists, or playlists on Spotify.
     
@@ -1192,7 +1193,7 @@ def search_spotify(query: str, search_type: str = "track", limit: int = 5) -> st
         return f"Error searching Spotify: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def add_to_queue(uri: str) -> str:
     """Add a song to the user's playback queue.
     
@@ -1207,7 +1208,7 @@ def add_to_queue(uri: str) -> str:
         return f"Error adding to queue: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def get_user_playlists(limit: int = 10) -> str:
     """Get the current user's playlists with song counts.
     
@@ -1229,7 +1230,7 @@ def get_user_playlists(limit: int = 10) -> str:
         return f"Error fetching playlists: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def get_user_top_tracks(limit: int = 10, time_range: str = "medium_term") -> str:
     """Get the current user's top songs over a specified period.
     
@@ -1252,7 +1253,7 @@ def get_user_top_tracks(limit: int = 10, time_range: str = "medium_term") -> str
         return f"Error fetching top songs: {str(e)}"
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def get_user_top_songs(limit: int = 10, time_range: str = "medium_term") -> str:
     """Get the current user's top songs over a specified period."""
     return get_user_top_tracks(limit=limit, time_range=time_range)
@@ -1341,7 +1342,7 @@ def start_background_web_app(default_port: int = 8000, open_browser: bool = True
         return WEB_APP_PORT
 
 
-@mcp.tool()
+@mcp.tool(annotations=ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=True))
 def open_soundtrack_studio() -> str:
     """Launch or retrieve the URL for the Soundtrack Curator & Staging Studio web application.
     
@@ -1360,4 +1361,5 @@ if __name__ == "__main__":
         mcp.run()
     except KeyboardInterrupt:
         pass
+
 

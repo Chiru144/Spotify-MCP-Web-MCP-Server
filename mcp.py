@@ -142,6 +142,13 @@ if __name__ == "__main__":
     # 1. First ensure we are authenticated via a GUI popup if necessary
     check_and_authenticate()
     
+    # Start the background web app so the UI is available
+    auto_open = os.getenv("OPEN_BROWSER", "true").strip().lower() not in ("0", "false", "no")
+    server.start_background_web_app(default_port=8000, open_browser=auto_open)
+    
     # 2. Then start the standard MCP Server over stdio
     print("Starting fully integrated Spotify MCP Server via stdio...", file=sys.stderr)
-    server.mcp.run()
+    try:
+        server.mcp.run()
+    except KeyboardInterrupt:
+        pass
