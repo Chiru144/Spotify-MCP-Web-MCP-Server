@@ -1454,6 +1454,14 @@
     </a>
 
     <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-right: 12px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+        <input type="range" id="volumeSlider" min="0" max="100" value="50" style="width: 80px; accent-color: var(--spotify-green); cursor: pointer;" onchange="setVolume(this.value)" title="Volume">
+      </div>
+
       <a href="/tools" class="nav-link">Advanced Tools</a>
       <button class="nav-btn" onclick="openFetchPlaylistModal()" title="Fetch any Spotify playlist or browse your playlists">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2071,6 +2079,39 @@
 
         applySortingAndRender();
         
+        // Auto-load tracks in the background for movies/actors
+        if (currentMode === 'movies' || currentMode === 'actors') {
+          (async () => {
+            for (let i = 0; i < activeItems.length; i++) {
+              const movie = activeItems[i];
+              if (movie && (!movie.tracks || movie.tracks.length === 0)) {
+                if (lastQuery !== query) break;
+                try {
+                  const res = await fetch(`/api/movie/tracks?movie_title=${encodeURIComponent(movie.title)}`);
+                  const data = await res.json();
+                  movie.tracks = data.tracks || [];
+                  
+                  const currentIndex = activeItems.indexOf(movie);
+                  if (currentIndex !== -1 && lastQuery === query) {
+                     const countSpan = document.getElementById(`tracks-count-${currentIndex}`);
+                     const toggleBtn = document.getElementById(`btn-toggle-tracks-${currentIndex}`);
+                     const addAllBtn = document.getElementById(`btn-add-all-${currentIndex}`);
+                     if (countSpan) countSpan.textContent = `(${movie.tracks.length} Songs)`;
+                     if (toggleBtn) {
+                         toggleBtn.textContent = movie.tracks.length > 0 ? '🎵 Show Songs' : 'No Songs Found';
+                         toggleBtn.disabled = false;
+                     }
+                     if (addAllBtn && movie.tracks.length > 0) addAllBtn.style.display = 'inline-flex';
+
+                     const totalSongs = activeItems.reduce((acc, m) => acc + (m.tracks ? m.tracks.length : 0), 0);
+                     const badge = document.getElementById('resultsCountBadge');
+                     if (badge) badge.textContent = `${activeItems.length} Movies (${totalSongs} Songs)`;
+                  }
+                } catch (e) {}
+              }
+            }
+          })();
+        }
 
       } catch (err) {
         btnText.textContent = 'Explore';
@@ -2165,7 +2206,8 @@
         card.id = `movie-card-${mIndex}`;
 
         const year = m.release_date ? m.release_date.split('-')[0] : 'TBA';
-        const hasTracks = Array.isArray(m.tracks) && m.tracks.length > 0;
+        const tracksLoaded = Array.isArray(m.tracks);
+        const hasTracks = tracksLoaded && m.tracks.length > 0;
 
         card.innerHTML = `
           <div class="poster-box" style="cursor: pointer;" onclick="toggleMovieSoundtracks(${mIndex}, '${escapeHtml(m.title)}')" title="Click to view soundtrack songs for ${escapeHtml(m.title)}">
@@ -2188,11 +2230,11 @@
             <div class="tracks-section" id="tracks-section-${mIndex}">
               <div class="tracks-header">
                 <span class="tracks-label">
-                  🎵 Soundtracks <span id="tracks-count-${mIndex}">(${hasTracks ? m.tracks.length + ' Songs' : 'Click to load songs'})</span>
+                  🎵 Soundtracks <span id="tracks-count-${mIndex}">(${hasTracks ? m.tracks.length + ' Songs' : (tracksLoaded ? '0 Songs' : 'Loading songs...')})</span>
                 </span>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                  <button class="view-soundtracks-btn" id="btn-toggle-tracks-${mIndex}" onclick="toggleMovieSoundtracks(${mIndex}, '${escapeHtml(m.title)}')">
-                    ${hasTracks ? '▼ Hide Songs' : '🎵 Show Songs'}
+                  <button class="view-soundtracks-btn" id="btn-toggle-tracks-${mIndex}" onclick="toggleMovieSoundtracks(${mIndex}, '${escapeHtml(m.title)}')" ${!tracksLoaded ? 'disabled' : ''}>
+                    ${hasTracks ? '▼ Hide Songs' : (tracksLoaded ? 'No Songs Found' : 'Loading...')}
                   </button>
                   <button class="add-all-btn" id="btn-add-all-${mIndex}" onclick="addAllTracksFromMovie(${mIndex})" style="${hasTracks ? '' : 'display: none;'}">
                     + Add All Songs to Send Box
@@ -2251,7 +2293,8 @@
         card.id = `movie-card-${mIndex}`;
 
         const year = m.release_date ? m.release_date.split('-')[0] : 'TBA';
-        const hasTracks = Array.isArray(m.tracks) && m.tracks.length > 0;
+        const tracksLoaded = Array.isArray(m.tracks);
+        const hasTracks = tracksLoaded && m.tracks.length > 0;
 
         card.innerHTML = `
           <div class="poster-box" style="cursor: pointer;" onclick="toggleMovieSoundtracks(${mIndex}, '${escapeHtml(m.title)}')" title="Click to view soundtrack songs for ${escapeHtml(m.title)}">
@@ -2274,11 +2317,11 @@
             <div class="tracks-section" id="tracks-section-${mIndex}">
               <div class="tracks-header">
                 <span class="tracks-label">
-                  🎵 Soundtracks <span id="tracks-count-${mIndex}">(${hasTracks ? m.tracks.length + ' Songs' : 'Click to load songs'})</span>
+                  🎵 Soundtracks <span id="tracks-count-${mIndex}">(${hasTracks ? m.tracks.length + ' Songs' : (tracksLoaded ? '0 Songs' : 'Loading songs...')})</span>
                 </span>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                  <button class="view-soundtracks-btn" id="btn-toggle-tracks-${mIndex}" onclick="toggleMovieSoundtracks(${mIndex}, '${escapeHtml(m.title)}')">
-                    ${hasTracks ? '▼ Hide Songs' : '🎵 Show Songs'}
+                  <button class="view-soundtracks-btn" id="btn-toggle-tracks-${mIndex}" onclick="toggleMovieSoundtracks(${mIndex}, '${escapeHtml(m.title)}')" ${!tracksLoaded ? 'disabled' : ''}>
+                    ${hasTracks ? '▼ Hide Songs' : (tracksLoaded ? 'No Songs Found' : 'Loading...')}
                   </button>
                   <button class="add-all-btn" id="btn-add-all-${mIndex}" onclick="addAllTracksFromMovie(${mIndex})" style="${hasTracks ? '' : 'display: none;'}">
                     + Add All Songs to Send Box
@@ -2349,6 +2392,7 @@
                     </a>
                   ` : ''}
                   <button class="play-song-btn" onclick="playSong('${escapeHtml(t.uri)}')" title="Play on active Spotify device">▶</button>
+                  <button class="play-song-btn queue-song-btn" onclick="queueSong('${escapeHtml(t.uri)}')" title="Add to Queue" style="background: var(--surface-light); margin-right: 6px;">⮎</button>
                   <button 
                     class="add-song-btn ${isStaged ? 'added' : ''}" 
                     id="btn-movie-${mIndex}-${tIndex}"
@@ -2416,6 +2460,50 @@
     }
 
     // Render Singers & Artists Mode
+    async function setVolume(val) {
+      try {
+        const response = await fetch('/api/player/volume', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ volume_percent: parseInt(val, 10) })
+        });
+        const data = await response.json();
+        if (!data.success) {
+          if (data.need_auth) {
+            openAuthHelperModal(data.auth_url);
+          } else {
+            showToast(data.error || "Failed to set volume.", true);
+          }
+        }
+      } catch (err) {
+        showToast("Error connecting to server.", true);
+      }
+    }
+
+    async function queueSong(uri) {
+      if (!uri) return;
+      try {
+        const response = await fetch('/api/player/queue', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ track_uri: uri })
+        });
+        const data = await response.json();
+        if (!data.success) {
+          if (data.need_auth) {
+            openAuthHelperModal(data.auth_url);
+            showToast("Please connect Spotify to queue songs.", true);
+          } else {
+            showToast(data.error || "Failed to add song to queue.", true);
+          }
+        } else {
+          showToast("Added to queue!");
+        }
+      } catch (err) {
+        showToast("Error connecting to server.", true);
+      }
+    }
+
     async function playSong(uri) {
       if (!uri) return;
       try {
@@ -3386,6 +3474,215 @@
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
     }
+  </script>
+  <!-- Floating Player Widget -->
+  <style>
+    .floating-player {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(18, 24, 34, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      width: 300px;
+      transition: opacity 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .floating-player.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .fp-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .fp-art {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #1e293b;
+    }
+    .fp-meta {
+      flex: 1;
+      min-width: 0;
+    }
+    .fp-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    .fp-artist {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fp-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 4px;
+    }
+    .fp-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      border-radius: 50%;
+      transition: transform 0.2s, color 0.2s;
+    }
+    .fp-btn:hover {
+      transform: scale(1.1);
+      color: var(--spotify-green);
+    }
+    .fp-playpause {
+      background: #fff;
+      color: #000;
+      width: 32px;
+      height: 32px;
+    }
+    .fp-playpause:hover {
+      background: var(--spotify-green);
+      color: #000;
+    }
+    .fp-progress-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .fp-progress-bar {
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .fp-progress-fill {
+      height: 100%;
+      background: var(--spotify-green);
+      width: 0%;
+      transition: width 1s linear;
+    }
+  </style>
+
+  <div class="floating-player" id="floatingPlayer">
+    <div class="fp-info">
+      <img src="" id="fpArt" class="fp-art" alt="cover">
+      <div class="fp-meta">
+        <div class="fp-title" id="fpTitle">Loading...</div>
+        <div class="fp-artist" id="fpArtist">-</div>
+      </div>
+    </div>
+    <div class="fp-progress-container">
+      <span id="fpTime">0:00</span>
+      <div class="fp-progress-bar">
+        <div class="fp-progress-fill" id="fpProgressFill"></div>
+      </div>
+      <span id="fpDuration">0:00</span>
+    </div>
+    <div class="fp-controls">
+      <button class="fp-btn" onclick="fpCommand('previous')" title="Previous">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+      </button>
+      <button class="fp-btn fp-playpause" id="fpPlayPause" onclick="fpTogglePlay()" title="Play/Pause">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="fp-btn" onclick="fpCommand('next')" title="Next">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let fpIsPlaying = false;
+
+    function formatMs(ms) {
+      if (!ms) return "0:00";
+      const totalSec = Math.floor(ms / 1000);
+      const min = Math.floor(totalSec / 60);
+      const sec = totalSec % 60;
+      return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+    }
+
+    async function fetchPlayerState() {
+      try {
+        const res = await fetch('/api/player/state');
+        const data = await res.json();
+        const fp = document.getElementById('floatingPlayer');
+        
+        if (!data.success || !data.track) {
+          fp.classList.remove('visible');
+          return;
+        }
+
+        fp.classList.add('visible');
+        
+        document.getElementById('fpTitle').textContent = data.track.name;
+        document.getElementById('fpArtist').textContent = data.track.artist;
+        document.getElementById('fpArt').src = data.track.album_cover || 'https://via.placeholder.com/48/121824/64748b?text=♪';
+        
+        document.getElementById('fpTime').textContent = formatMs(data.progress_ms);
+        document.getElementById('fpDuration').textContent = formatMs(data.duration_ms);
+        
+        const pct = (data.progress_ms / (data.duration_ms || 1)) * 100;
+        document.getElementById('fpProgressFill').style.width = `${pct}%`;
+
+        fpIsPlaying = data.is_playing;
+        const ppIcon = document.getElementById('fpPlayPause');
+        if (fpIsPlaying) {
+          // Pause Icon
+          ppIcon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+        } else {
+          // Play Icon
+          ppIcon.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+        }
+
+      } catch (err) {
+        // silently fail on state poll
+      }
+    }
+
+    async function fpCommand(cmd) {
+      try {
+        await fetch(`/api/player/${cmd}`, { method: 'POST' });
+        setTimeout(fetchPlayerState, 500);
+      } catch (err) { }
+    }
+
+    async function fpTogglePlay() {
+      if (fpIsPlaying) {
+        await fpCommand('pause');
+      } else {
+        await fpCommand('resume');
+      }
+    }
+
+    // Start polling playback state
+    setInterval(fetchPlayerState, 2000);
+    setTimeout(fetchPlayerState, 500);
   </script>
 </body>
 </html>

@@ -203,10 +203,19 @@ def fetch_soundtrack_tracks(movie_title: str, language_name: str = None) -> list
                         return True
             return False
             
+        # Fetch user market to avoid playing regionally locked tracks which cause the client to pause
+        market = "US"
+        try:
+            me = client.me()
+            if me and me.get('country'):
+                market = me.get('country')
+        except:
+            pass
+
         # Strategy 1: Search for album with "soundtrack" or "OST"
         albums = []
         for q in [f"album:{search_title} soundtrack", f"{search_title} soundtrack", f"{search_title} ost", search_title]:
-            res = client.search(q=q, type="album", limit=3)
+            res = client.search(q=q, type="album", limit=3, market=market)
             found = res.get("albums", {}).get("items", [])
             for album in found:
                 if is_fuzzy_match(clean_title, album.get("name", "")):
@@ -222,9 +231,12 @@ def fetch_soundtrack_tracks(movie_title: str, language_name: str = None) -> list
             album_cover = album.get("images", [{}])[0].get("url") if album.get("images") else None
             album_release = album.get("release_date", "")
 
-            tracks_res = client.album_tracks(album_id, limit=20)
+            tracks_res = client.album_tracks(album_id, limit=20, market=market)
             formatted = []
             for t in tracks_res.get("items", []):
+                # Ensure track is playable in user's market
+                if hasattr(t, "get") and t.get("is_playable") is False:
+                    continue
                 artists = ", ".join(a.get("name", "Unknown") for a in t.get("artists", []))
                 artist_ids = [a.get("id") for a in t.get("artists", []) if a.get("id")]
                 formatted.append({
@@ -247,8 +259,11 @@ def fetch_soundtrack_tracks(movie_title: str, language_name: str = None) -> list
         tracks_list = []
         seen_uris = set()
         for fq in fallback_queries:
-            fallback = client.search(q=fq, type="track", limit=10)
+            fallback = client.search(q=fq, type="track", limit=10, market=market)
             for t in fallback.get("tracks", {}).get("items", []):
+                # Ensure track is playable in user's market
+                if hasattr(t, "get") and t.get("is_playable") is False:
+                    continue
                 uri = t.get("uri")
                 track_name = t.get("name", "").lower()
                 album_name = t.get("album", {}).get("name", "").lower()
@@ -429,7 +444,7 @@ def search_movies_only(
     selection = movies_raw[:limit]
 
     output = []
-    soundtrack_fetch_limit = min(limit, 25)
+    soundtrack_fetch_limit = 0 # Disabled synchronous fetching for faster loads
     total_songs_count = 0
     for idx, m in enumerate(selection):
         title = m.get("title")
@@ -560,7 +575,7 @@ def search_actors_only(
     selection = movies_raw[:limit]
 
     output = []
-    soundtrack_fetch_limit = min(limit, 25)
+    soundtrack_fetch_limit = 0 # Disabled synchronous fetching for faster loads
     total_songs_count = 0
     for idx, m in enumerate(selection):
         title = m.get("title")
@@ -1390,15 +1405,136 @@ def play_track(payload: PlayRequest):
             "error": "Spotify authorization required to control playback."
         }
     try:
-        user_client.start_playback(uris=[payload.track_uri])
-        return {"success": True}
+        # First ensure we have an active device or fallback device
+        devices = user_client.devices().get('devices', [])
+        fallback_id = None
+        for d in devices:
+            if d.get('is_active'):
+                fallback_id = d.get('id')
+                break
+        if not fallback_id and devices:
+            fallback_id = next((d.get('id') for d in devices if d.get('type') == 'Computer'), devices[0].get('id'))
+
+        if not fallback_id:
+            return {"success": False, "error": "No Spotify devices found. Please open the Spotify app."}
+
+        try:
+            # Add the track to the queue on the target device
+            user_client.add_to_queue(payload.track_uri, device_id=fallback_id)
+            # Skip to the newly queued track
+            user_client.next_track(device_id=fallback_id)
+            # Ensure it is actually playing (sometimes next_track leaves it paused)
+            user_client.start_playback(device_id=fallback_id)
+            return {"success": True}
+        except spotipy.exceptions.SpotifyException as e:
+            # If start_playback fails, it might already be playing. Ignore 403 on start_playback.
+            if e.http_status == 403 or e.http_status == 404:
+                return {"success": True}
+            raise e
     except spotipy.exceptions.SpotifyException as e:
-        # Code 403 often means no active device or premium required
-        return {"success": False, "error": "Could not play track. Make sure Spotify is open and active on one of your devices."}
+        return {"success": False, "error": f"Could not play track: {e.msg}"}
     except Exception as e:
         return {"success": False, "error": str(e)}
 
+class VolumeRequest(BaseModel):
+    volume_percent: int
 
+@app.post("/api/player/volume")
+def set_volume_endpoint(payload: VolumeRequest):
+    """Sets the volume on the active device."""
+    user_client = _get_valid_user_client()
+    if not user_client:
+        return {"success": False, "need_auth": True}
+    try:
+        user_client.volume(payload.volume_percent)
+        return {"success": True}
+    except spotipy.exceptions.SpotifyException as e:
+        return {"success": False, "error": str(e.msg)}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/player/queue")
+def queue_track_2(payload: PlayRequest):
+    # This overrides the earlier queue_track if it existed by accident.
+    user_client = _get_valid_user_client()
+    if not user_client:
+        return {"success": False, "need_auth": True}
+    try:
+        user_client.add_to_queue(payload.track_uri)
+        return {"success": True}
+    except spotipy.exceptions.SpotifyException as e:
+        if e.http_status == 404:
+            return {"success": False, "error": "No active Spotify device found. Please play something first."}
+        return {"success": False, "error": str(e.msg)}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.get("/api/player/state")
+def get_player_state():
+    """Gets the current playback state."""
+    user_client = _get_valid_user_client()
+    if not user_client:
+        return {"success": False, "need_auth": True}
+    try:
+        state = user_client.current_playback()
+        if not state or not state.get("item"):
+            return {"success": True, "is_playing": False, "track": None}
+        
+        item = state.get("item")
+        return {
+            "success": True,
+            "is_playing": state.get("is_playing", False),
+            "progress_ms": state.get("progress_ms", 0),
+            "duration_ms": item.get("duration_ms", 0),
+            "track": {
+                "name": item.get("name"),
+                "artist": ", ".join(a.get("name", "Unknown") for a in item.get("artists", [])),
+                "album_cover": item.get("album", {}).get("images", [{}])[0].get("url") if item.get("album", {}).get("images") else None,
+                "uri": item.get("uri")
+            }
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/player/pause")
+def pause_playback():
+    user_client = _get_valid_user_client()
+    if not user_client: return {"success": False}
+    try:
+        user_client.pause_playback()
+        return {"success": True}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/player/resume")
+def resume_playback():
+    user_client = _get_valid_user_client()
+    if not user_client: return {"success": False}
+    try:
+        user_client.start_playback()
+        return {"success": True}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/player/next")
+def next_track():
+    user_client = _get_valid_user_client()
+    if not user_client: return {"success": False}
+    try:
+        user_client.next_track()
+        return {"success": True}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/player/previous")
+def prev_track():
+    user_client = _get_valid_user_client()
+    if not user_client: return {"success": False}
+    try:
+        user_client.previous_track()
+        return {"success": True}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 @app.get("/tools", response_class=HTMLResponse)
 def serve_tools():

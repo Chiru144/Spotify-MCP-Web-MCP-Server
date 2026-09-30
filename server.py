@@ -1057,25 +1057,71 @@ def get_current_playback() -> str:
         return f"Error fetching current playback: {str(e)}"
 
 
+<<<<<<< HEAD
 @mcp.tool(annotations=ToolAnnotations(read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=True))
 def play_track(uri: Optional[str] = None, context_uri: Optional[str] = None) -> str:
     """Resume playback or play a specific song/album/playlist by URI.
     
+=======
+@mcp.tool()
+def play_track(
+    device_id: Optional[str] = None,
+    context_uri: Optional[str] = None,
+    uris: Optional[list[str]] = None,
+    uri: Optional[str] = None,
+    offset_position: Optional[int] = None,
+    position_ms: Optional[int] = None,
+) -> str:
+    """Start or resume playback.
+
+>>>>>>> 73c8d9a (Update Spotify MCP server)
     Args:
-        uri: Spotify song URI (e.g. 'spotify:track:...')
-        context_uri: Spotify album, artist, or playlist URI (e.g. 'spotify:playlist:...')
+        device_id: ID of the device to play on. Uses active device if omitted.
+        context_uri: Spotify URI of context (album, artist, playlist).
+        uris: List of Spotify track URIs to play. E.g. ["spotify:track:xxx"].
+        uri: Single track URI (for backward compatibility).
+        offset_position: Position in the context to start playback (0-based index).
+        position_ms: Position in milliseconds to seek to.
     """
     try:
         sp = get_spotify_client()
-        if uri:
-            sp.start_playback(uris=[uri])
-            return f"Started playback for song: {uri}"
-        elif context_uri:
-            sp.start_playback(context_uri=context_uri)
-            return f"Started playback for context: {context_uri}"
-        else:
-            sp.start_playback()
-            return "Resumed playback."
+        
+        # Consolidate uri/uris
+        if uri and not uris:
+            uris = [uri]
+
+        kwargs = {}
+        if context_uri:
+            kwargs["context_uri"] = context_uri
+        if uris:
+            kwargs["uris"] = uris
+        if offset_position is not None:
+            kwargs["offset"] = {"position": offset_position}
+        if position_ms is not None:
+            kwargs["position_ms"] = position_ms
+            
+        # Try playback
+        try:
+            sp.start_playback(device_id=device_id, **kwargs)
+            return "Playback started/resumed."
+        except spotipy.exceptions.SpotifyException as e:
+            # If 404 and no device_id was forced, attempt to find an active/fallback device
+            if e.http_status == 404 and not device_id:
+                devices = sp.devices().get('devices', [])
+                if not devices:
+                    return "Error: No active devices found."
+                fallback_id = None
+                for d in devices:
+                    if d.get('is_active'):
+                        fallback_id = d.get('id')
+                        break
+                if not fallback_id:
+                    fallback_id = next((d.get('id') for d in devices if d.get('type') == 'Computer'), devices[0].get('id'))
+                
+                sp.start_playback(device_id=fallback_id, **kwargs)
+                return "Playback started/resumed on fallback device."
+            raise e
+            
     except Exception as e:
         return f"Error playing: {str(e)}"
 
@@ -1351,6 +1397,74 @@ def open_soundtrack_studio() -> str:
     port = start_background_web_app(default_port=8000, open_browser=True)
     url = f"http://127.0.0.1:{port}"
     return f"Soundtrack Curator & Staging Studio is running at {url}. Opened in your default browser!"
+
+@mcp.tool()
+def update_playlist(playlist_id: str, name: Optional[str] = None, description: Optional[str] = None, public: Optional[bool] = None) -> str:
+    """Update a playlist's name, description, or public status."""
+    try:
+        sp = get_spotify_client()
+        kwargs = {}
+        if name is not None:
+            kwargs["name"] = name
+        if description is not None:
+            kwargs["description"] = description
+        if public is not None:
+            kwargs["public"] = public
+        sp.playlist_change_details(playlist_id, **kwargs)
+        return f"Successfully updated playlist {playlist_id}."
+    except Exception as e:
+        return f"Error updating playlist: {str(e)}"
+
+@mcp.tool()
+def get_saved_tracks(limit: int = 50, offset: int = 0) -> str:
+    """Get tracks from the user's Library (Saved Tracks)."""
+    try:
+        sp = get_spotify_client()
+        results = sp.current_user_saved_tracks(limit=limit, offset=offset)
+        items = results.get("items", [])
+        if not items:
+            return "No saved tracks found in your library."
+        output = [f"Found {len(items)} saved tracks (offset {offset}):"]
+        for i, item in enumerate(items, 1):
+            t = item.get("track", {})
+            artists = ", ".join([a.get("name", "Unknown") for a in t.get("artists", [])])
+            output.append(f"{i}. {t.get('name')} by {artists} (URI: {t.get('uri')})")
+        return "\n".join(output)
+    except Exception as e:
+        return f"Error fetching saved tracks: {str(e)}"
+
+@mcp.tool()
+def get_playlist_tracks(playlist_id: str, limit: int = 100, offset: int = 0) -> str:
+    """Get the tracks currently inside a specific playlist."""
+    try:
+        sp = get_spotify_client()
+        results = sp.playlist_items(playlist_id, limit=limit, offset=offset)
+        items = results.get("items", [])
+        if not items:
+            return "No tracks found in this playlist."
+        output = [f"Playlist tracks (offset {offset}):"]
+        for i, item in enumerate(items, 1):
+            t = item.get("track", {})
+            if not t:
+                continue
+            artists = ", ".join([a.get("name", "Unknown") for a in t.get("artists", [])])
+            output.append(f"{i}. {t.get('name')} by {artists} (URI: {t.get('uri')})")
+        return "\n".join(output)
+    except Exception as e:
+        return f"Error fetching playlist tracks: {str(e)}"
+
+@mcp.tool()
+def remove_tracks_from_playlist(playlist_id: str, uris: list[str]) -> str:
+    """Remove one or more tracks from a playlist by their URIs."""
+    try:
+        sp = get_spotify_client()
+        # Spotify API accepts up to 100 tracks per request
+        for i in range(0, len(uris), 100):
+            batch = uris[i:i+100]
+            sp.playlist_remove_all_occurrences_of_items(playlist_id, batch)
+        return f"Successfully removed {len(uris)} tracks from playlist {playlist_id}."
+    except Exception as e:
+        return f"Error removing tracks from playlist: {str(e)}"
 
 
 if __name__ == "__main__":
