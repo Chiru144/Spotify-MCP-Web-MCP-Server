@@ -1,10 +1,6 @@
 # Spotify & TMDB Web MCP Server
 
-<<<<<<< HEAD
-[![M8ven Score](https://m8ven.ai/badge/mcp/chiru144-spotify-mcp-web-mcp-server-xbliwe)](https://m8ven.ai/mcp/chiru144-spotify-mcp-web-mcp-server-xbliwe)
-=======
 [![M8ven Trust](https://m8ven.ai/badges/chiru144/spotify-mcp-web-mcp-server)](https://m8ven.ai/mcp/chiru144/spotify-mcp-web-mcp-server)
->>>>>>> 73c8d9a (Update Spotify MCP server)
 
 This repository contains a FastMCP application that integrates Spotify and TMDB (The Movie Database). It allows you to build custom soundtracks and interact with a web-based Soundtrack Curator & Staging Studio.
 
@@ -12,14 +8,14 @@ This repository contains a FastMCP application that integrates Spotify and TMDB 
 
 - **Cross-Domain Media Blending**: Bridges cinema and music by letting your AI dynamically look up movies, cast, or crew on TMDB and map them into custom Spotify playlists.
 - **Dual Web & Agent Design**: Built on FastAPI/Uvicorn, it functions as both a flexible web endpoint and an MCP server, supporting remote hosting and multiple networked AI connections.
-- **Pythonic Customizability**: A clean FastAPI backend makes it easy to write and extend custom logic (like multi-step prompt workflows) without relying on wrappers.
+- **Modular Architecture**: The codebase is cleanly separated into specialized tool modules (`playback.py`, `playlists.py`, `taste.py`, `search.py`), making it highly scalable and completely unit-testable.
 
 ## Features
 
-- **Full Playback Control**: Play, pause, skip tracks, adjust volume, and manage your queue directly through chat.
-- **Playlist Management**: Create new playlists, add songs, shuffle, combine multiple playlists, and remove duplicates.
+- **Full Playback Control**: Play, pause, skip, seek to specific times, adjust volume, toggle repeat/shuffle, switch active devices (Premium), and manage your queue.
+- **Smart Playlist Management**: Create playlists, combine, dedupe, and intelligently reorder tracks based on audio features (e.g., sorting by energy arcs or valence).
 - **Search & Library Access**: Search for tracks, albums, artists, or playlists on Spotify, and access your saved playlists.
-- **Personal Listening Insights**: Retrieve your top played songs across different time periods (short, medium, or long term).
+- **Deep Taste Analysis & Insights**: Retrieve top played songs and artists (short/medium/long term), analyze deep audio features (danceability, valence, energy), and map related artist networks.
 - **TMDB Movie & Actor Search**: Look up rich biographical profiles for actors or get release details, overviews, and ratings for movies directly from The Movie Database.
 - **Soundtrack Curator**: Integrated with TMDB and DuckDuckGo to automatically discover an actor's filmography, find the corresponding soundtracks, and build a dedicated Spotify playlist.
 - **Soundtrack Staging Studio**: A local web interface to visualize and manage your curated soundtracks.

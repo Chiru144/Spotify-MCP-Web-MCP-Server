@@ -1,0 +1,3391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soundtrack Curator — Filmography & Spotify Staging Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <style>
+    :root {
+      --bg-dark: #090c10;
+      --bg-card: rgba(18, 24, 34, 0.75);
+      --bg-card-hover: rgba(26, 35, 49, 0.85);
+      --bg-surface: #101722;
+      --bg-input: #151e2b;
+      --spotify-green: #1db954;
+      --spotify-green-hover: #1ed760;
+      --spotify-green-glow: rgba(29, 185, 84, 0.35);
+      --accent-blue: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-amber: #f59e0b;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(29, 185, 84, 0.6);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 15% 10%, rgba(29, 185, 84, 0.12), transparent 40%),
+                  radial-gradient(circle at 85% 80%, rgba(56, 189, 248, 0.08), transparent 45%),
+                  var(--bg-dark);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 0;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* Header Nav */
+    header {
+      background: rgba(9, 12, 16, 0.85);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--spotify-green), #0d7031);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px var(--spotify-green-glow);
+    }
+
+    .brand-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: #fff;
+    }
+
+    .brand-text h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      transition: var(--transition-smooth);
+    }
+    
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      margin-right: 16px;
+      transition: var(--transition-smooth);
+    }
+    .nav-link:hover { color: #fff; }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--spotify-green);
+      box-shadow: 0 0 8px var(--spotify-green);
+      animation: pulse-dot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+    }
+
+    /* Main Container */
+    .app-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px 32px 64px 32px;
+    }
+
+    /* Option Bar (Mode Toggle: Songs vs Movies) */
+    .mode-bar-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .mode-bar {
+      display: inline-flex;
+      background: rgba(18, 24, 34, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 4px;
+      border-radius: var(--radius-full);
+      gap: 4px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .mode-tab {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 24px;
+      border-radius: var(--radius-full);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition-smooth);
+    }
+
+    .mode-tab:hover {
+      color: #fff;
+    }
+
+    .mode-tab.active {
+      background: linear-gradient(135deg, var(--spotify-green), #16a34a);
+      color: #000;
+      box-shadow: 0 0 16px var(--spotify-green-glow);
+    }
+
+    /* Hero Search Bar & Controls Bar */
+    .hero-section {
+      text-align: center;
+      max-width: 980px;
+      margin: 0 auto 36px auto;
+    }
+
+    .hero-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 24px;
+    }
+
+    /* Combined Search Bar & Dropdowns Row */
+    .search-control-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-surface);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 6px 10px 6px 18px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      transition: var(--transition-smooth);
+      flex-wrap: wrap;
+    }
+
+    .search-control-bar:focus-within {
+      border-color: var(--spotify-green);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 0 3px var(--spotify-green-glow);
+    }
+
+    .search-icon {
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 220px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-size: 16px;
+      font-weight: 500;
+      font-family: inherit;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    /* Controls right next to search bar */
+    .control-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 6px 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .control-item label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+
+    .custom-select {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .custom-select option {
+      background: #101722;
+      color: #fff;
+    }
+
+    .search-btn {
+      background: linear-gradient(135deg, var(--spotify-green), #16a34a);
+      color: #000;
+      border: none;
+      padding: 11px 24px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition-smooth);
+      box-shadow: 0 4px 14px rgba(29, 185, 84, 0.4);
+      flex-shrink: 0;
+    }
+
+    .search-btn:hover {
+      background: var(--spotify-green-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(29, 185, 84, 0.55);
+    }
+
+    .search-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Split Grid Layout: Main Content & Sticky Send Box */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 32px;
+      align-items: start;
+    }
+
+    @media (max-width: 1080px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      .send-box-wrapper {
+        position: static !important;
+        order: -1;
+        margin-bottom: 24px;
+      }
+    }
+
+    /* Left Area: Results Timeline */
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .timeline-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .timeline-badge {
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      color: var(--text-muted);
+      font-weight: normal;
+    }
+
+    .results-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+    }
+
+    /* Movie Card */
+    .movie-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 22px;
+      box-shadow: var(--glass-shadow);
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .movie-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .poster-box {
+      position: relative;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      aspect-ratio: 2/3;
+      background: #18222e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    }
+
+    .poster-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .movie-card:hover .poster-img {
+      transform: scale(1.04);
+    }
+
+    .poster-fallback {
+      color: var(--text-dim);
+      font-size: 32px;
+    }
+
+    .movie-content {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .movie-meta-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .year-chip {
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent-blue);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .rating-chip {
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--accent-amber);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .popularity-chip {
+      background: rgba(168, 85, 247, 0.12);
+      color: var(--accent-purple);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .movie-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+
+    .movie-role {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .movie-role strong {
+      color: #e2e8f0;
+    }
+
+    .movie-synopsis {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.45;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Soundtracks Inside Movie Card */
+    .tracks-section {
+      background: rgba(12, 17, 24, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      margin-top: auto;
+    }
+
+    .tracks-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .tracks-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .add-all-btn {
+      background: transparent;
+      border: 1px solid rgba(29, 185, 84, 0.35);
+      color: var(--spotify-green);
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .add-all-btn:hover {
+      background: rgba(29, 185, 84, 0.15);
+      border-color: var(--spotify-green);
+      transform: scale(1.02);
+    }
+
+    .tracks-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .track-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition-smooth);
+      gap: 12px;
+    }
+
+    .track-row:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .track-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .track-thumb {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #1e293b;
+      flex-shrink: 0;
+    }
+
+    .track-details {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .track-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .track-artist {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .track-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .spotify-link-btn {
+      color: var(--text-dim);
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      padding: 4px;
+    }
+
+    .spotify-link-btn:hover {
+      color: var(--spotify-green);
+    }
+
+    .add-song-btn {
+      background: rgba(29, 185, 84, 0.15);
+      border: 1px solid rgba(29, 185, 84, 0.3);
+      color: var(--spotify-green);
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: var(--transition-smooth);
+    }
+
+    .add-song-btn:hover {
+      background: var(--spotify-green);
+      color: #000;
+      box-shadow: 0 0 12px var(--spotify-green-glow);
+    }
+
+    .add-song-btn.added {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--text-muted);
+      cursor: default;
+    }
+
+    .play-song-btn {
+      background: transparent;
+      color: var(--text-dim);
+      border: none;
+      padding: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .play-song-btn:hover {
+      color: var(--brand-color, #1db954);
+    }
+
+    .empty-tracks-msg {
+      font-size: 12px;
+      color: var(--text-dim);
+      padding: 8px 0;
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* Direct Songs Mode Card / List */
+    .song-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: var(--glass-shadow);
+      transition: var(--transition-smooth);
+    }
+
+    .song-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .song-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .song-cover {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #1e293b;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .song-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .song-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .song-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .song-meta-chips {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .popularity-meter {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--spotify-green);
+      font-weight: 600;
+    }
+
+    .popularity-bar {
+      width: 45px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .popularity-fill {
+      height: 100%;
+      background: var(--spotify-green);
+    }
+
+    /* Right Area: Sticky Send Box */
+    .send-box-wrapper {
+      position: sticky;
+      top: 96px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+
+    .send-box-wrapper::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .send-box-wrapper::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+    }
+
+    .send-box-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(29, 185, 84, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(29, 185, 84, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .send-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .send-box-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+    }
+
+    .count-badge {
+      background: var(--spotify-green);
+      color: #000;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      box-shadow: 0 0 8px var(--spotify-green-glow);
+    }
+
+    .clear-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 12px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .clear-btn:hover {
+      color: #ef4444;
+    }
+
+    /* Custom Track Quick Search inside Send Box */
+    .manual-add-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      display: flex;
+      gap: 8px;
+      position: relative;
+    }
+
+    .manual-add-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    .manual-add-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .manual-add-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+
+    .manual-add-btn:hover {
+      background: var(--spotify-green);
+      color: #000;
+      border-color: var(--spotify-green);
+    }
+
+    /* Staged Songs List */
+    .staged-list {
+      max-height: 330px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    .staged-list::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .staged-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+    }
+
+    .staged-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      transition: var(--transition-smooth);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .staged-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .staged-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .staged-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .staged-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .source-movie-tag {
+      color: var(--accent-blue);
+      font-size: 10px;
+      background: rgba(56, 189, 248, 0.1);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .remove-staged-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .remove-staged-btn:hover {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.12);
+    }
+
+    .staged-empty {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-dim);
+      font-size: 13px;
+      border: 1px dashed rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .staged-empty svg {
+      width: 36px;
+      height: 36px;
+      stroke: var(--text-dim);
+      opacity: 0.7;
+    }
+
+    /* Send Box Actions / Target */
+    .destination-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 14px;
+    }
+
+    .playlist-name-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+
+    .playlist-name-input:focus {
+      border-color: var(--spotify-green);
+    }
+
+    .action-btn-primary {
+      background: linear-gradient(135deg, var(--spotify-green), #16a34a);
+      color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition-smooth);
+      box-shadow: 0 4px 16px rgba(29, 185, 84, 0.35);
+    }
+
+    .action-btn-primary:hover:not(:disabled) {
+      background: var(--spotify-green-hover);
+      box-shadow: 0 6px 20px rgba(29, 185, 84, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .action-btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .action-btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition-smooth);
+    }
+
+    .action-btn-secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .action-btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Skeleton Loading State */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: #182230;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-left: 4px solid var(--spotify-green);
+      color: #fff;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 300px;
+      max-width: 420px;
+      font-size: 13px;
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast.error {
+      border-left-color: #ef4444;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .toast-link {
+      color: var(--spotify-green);
+      font-weight: 700;
+      text-decoration: underline;
+      margin-left: auto;
+    }
+
+    .toast-remove-btn {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: auto;
+      transition: var(--transition-smooth);
+      white-space: nowrap;
+    }
+    .toast-remove-btn:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    /* Artist Profile Hero Banner (Singers Mode) */
+    .artist-hero-card {
+      background: linear-gradient(135deg, rgba(29, 185, 84, 0.12), rgba(16, 23, 34, 0.85));
+      border: 1px solid rgba(29, 185, 84, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+      animation: fadeIn 0.3s ease-out;
+    }
+    .artist-hero-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--spotify-green);
+      box-shadow: 0 0 20px var(--spotify-green-glow);
+      flex-shrink: 0;
+    }
+    .artist-hero-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .artist-hero-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .artist-hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .genre-chip {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      color: #cbd5e1;
+    }
+
+    /* Movie Soundtracks Accordion Trigger Button */
+    .view-soundtracks-btn {
+      background: rgba(29, 185, 84, 0.12);
+      border: 1px solid rgba(29, 185, 84, 0.35);
+      color: var(--spotify-green);
+      padding: 7px 14px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: var(--transition-smooth);
+      margin-top: 8px;
+      width: fit-content;
+    }
+    .view-soundtracks-btn:hover {
+      background: var(--spotify-green);
+      color: #000;
+      box-shadow: 0 0 16px var(--spotify-green-glow);
+      transform: translateY(-1px);
+    }
+
+    /* Initial Blank State */
+    .empty-prompt {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(14px);
+    }
+
+    .empty-prompt-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    .empty-prompt h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .empty-prompt p {
+      color: var(--text-muted);
+      font-size: 14px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* Header Action Button */
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: var(--transition-smooth);
+    }
+    .nav-btn:hover {
+      background: rgba(29, 185, 84, 0.15);
+      border-color: var(--spotify-green);
+      color: var(--spotify-green);
+    }
+
+    /* Modal Backdrop & Container */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .modal-backdrop.active {
+      display: flex;
+    }
+    .modal-card {
+      background: #111722;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 620px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(29, 185, 84, 0.1);
+      overflow: hidden;
+      animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      border-radius: 6px;
+      transition: var(--transition-smooth);
+    }
+    .modal-close:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .modal-tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+    }
+    .modal-tab {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .modal-tab:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .modal-tab.active {
+      color: var(--spotify-green);
+      background: rgba(29, 185, 84, 0.12);
+      border-color: rgba(29, 185, 84, 0.3);
+    }
+    .playlist-card-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      transition: var(--transition-smooth);
+    }
+    .playlist-card-row:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(29, 185, 84, 0.3);
+    }
+    .playlist-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #1e293b;
+      flex-shrink: 0;
+    }
+    .playlist-meta {
+      min-width: 0;
+      flex: 1;
+    }
+    .playlist-row-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .playlist-row-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .modal-footer {
+      padding: 14px 24px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header>
+    <a href="#" class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.563.387-.857.207-2.35-1.435-5.308-1.76-8.792-.963-.335.077-.67-.133-.746-.468-.077-.334.132-.67.467-.746 3.808-.87 7.076-.496 9.72 1.115.295.18.388.563.208.855zm1.224-2.72c-.226.367-.708.482-1.075.257-2.687-1.652-6.785-2.131-9.965-1.166-.413.127-.848-.106-.973-.517-.125-.413.108-.848.52-0.973 3.632-1.102 8.147-.568 11.235 1.33.368.226.483.707.258 1.069zm.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71c-.494.15-1.018-.129-1.167-.624-.15-.495.13-1.018.625-1.167 3.532-1.073 9.404-.866 13.115 1.337.445.264.59.838.327 1.282-.264.443-.838.59-1.282.327z"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Soundtrack Curator</h1>
+      </div>
+    </a>
+
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="/tools" class="nav-link">Advanced Tools</a>
+      <button class="nav-btn" onclick="openFetchPlaylistModal()" title="Fetch any Spotify playlist or browse your playlists">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18V5l12-2v13"></path>
+          <circle cx="6" cy="18" r="3"></circle>
+          <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+        <span>Fetch Playlist</span>
+      </button>
+
+      <div class="user-pill" id="userStatusPill">
+        <div class="status-dot"></div>
+        <span id="userNameDisplay">Spotify Ready</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-container">
+
+    <!-- Option Bar: 3 Modes Switcher (Actors & Movies, Singers & Artists, Songs) -->
+    <div class="mode-bar-container">
+      <div class="mode-bar">
+        <button class="mode-tab active" id="modeMoviesBtn" onclick="switchMode('movies')">
+          🎬 Movies
+        </button>
+        <button class="mode-tab" id="modeActorsBtn" onclick="switchMode('actors')">
+          🎭 Actors
+        </button>
+        <button class="mode-tab" id="modeSingersBtn" onclick="switchMode('singers')">
+          🎤 Singers & Artists
+        </button>
+        <button class="mode-tab" id="modeSongsBtn" onclick="switchMode('songs')">
+          🎵 Songs
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <section class="hero-section">
+      <h2 class="hero-title" id="heroTitle">Explore Movie Soundtracks & Songs</h2>
+      <p class="hero-subtitle" id="heroSubtitle">
+        Search any movie title to discover official soundtrack albums and songs with complete song counts. Click on any movie card to load songs!
+      </p>
+      
+      <!-- Search & Controls Bar -->
+      <div class="search-control-bar">
+        <div class="search-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="Search movie title (e.g. Inception, Interstellar, Titanic, Oppenheimer)..." 
+          autocomplete="off"
+        />
+
+        <!-- Language Dropdown -->
+        <div class="control-item" title="Filter by Language">
+          <label for="langSelect">Lang:</label>
+          <select id="langSelect" class="custom-select" onchange="onFilterOrLimitChange()">
+            <option value="">Any</option>
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="te">Telugu</option>
+            <option value="ta">Tamil</option>
+            <option value="kn">Kannada</option>
+            <option value="ml">Malayalam</option>
+          </select>
+        </div>
+
+        <!-- Limit Dropdown: 10, 25, 50, 100, 200, 500, 1000 -->
+        <div class="control-item" title="Max results to fetch & show">
+          <label for="limitSelect">Show:</label>
+          <select id="limitSelect" class="custom-select" onchange="onFilterOrLimitChange()">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
+            <option value="500">500</option>
+            <option value="1000">1000</option>
+          </select>
+        </div>
+
+        <!-- Filter / Ranks Dropdown (Dynamically updated for Movies, Actors, Singers, Songs) -->
+        <div class="control-item" title="Rank filter & sort order">
+          <label for="rankSortSelect">Rank:</label>
+          <select id="rankSortSelect" class="custom-select" onchange="onFilterOrLimitChange()">
+            <!-- Populated dynamically via updateRankDropdown() -->
+          </select>
+        </div>
+
+        <button class="search-btn" id="searchBtn" onclick="performSearch()">
+          <span id="searchBtnText">Explore</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Main Content Grid -->
+    <div class="main-grid">
+
+      <!-- Left Column: Results Area -->
+      <section class="timeline-column">
+        <div class="timeline-header">
+          <h3 class="timeline-title" id="timelineTitle">
+            Results
+            <span class="timeline-badge" id="resultsCountBadge">0 Songs</span>
+          </h3>
+          <span style="font-size: 12px; color: var(--text-dim);" id="sortIndicator">Ordered by Rank</span>
+        </div>
+
+        <div id="results" class="results-container">
+          <!-- Initial Prompt State -->
+          <div class="empty-prompt">
+            <div class="empty-prompt-icon" id="emptyIcon">🎬</div>
+            <h3 id="emptyTitle">Ready to Explore Movies</h3>
+            <p id="emptyDesc">Type a movie title above to discover soundtracks and stage songs into your Send Box.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Send Box (Staging Crate) -->
+      <aside class="send-box-wrapper">
+        <div class="send-box-card">
+          
+          <div class="send-box-header">
+            <div class="send-box-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--spotify-green);">
+                <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                <rect x="1" y="3" width="22" height="5"></rect>
+                <line x1="10" y1="12" x2="14" y2="12"></line>
+              </svg>
+              Send Box
+              <span class="count-badge" id="stagedCount">0 Songs</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button class="clear-btn" id="shuffleSendBoxBtn" onclick="shuffleSendBoxSongs()" style="color: #38bdf8; display: flex; align-items: center; gap: 4px; font-weight: 600;" title="Shuffle all songs in Send Box into a different random order">
+                🔀 Shuffle Songs
+              </button>
+              <button class="clear-btn" onclick="clearSendBox()">Clear All</button>
+            </div>
+          </div>
+
+          <!-- Quick Add Manual Song / Custom Search -->
+          <div class="manual-add-box">
+            <input 
+              type="text" 
+              id="manualTrackInput" 
+              class="manual-add-input" 
+              placeholder="Search custom song to add..." 
+              onkeydown="if(event.key === 'Enter') searchAndAddCustomTrack()"
+            />
+          </div>
+
+          <!-- Staged Songs Scroll List -->
+          <div class="staged-list" id="stagedList">
+            <div class="staged-empty" id="stagedEmptyState">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+              </svg>
+              <span>No songs in Send Box yet. Click <strong>+ Send</strong> on any song to stage it here.</span>
+            </div>
+          </div>
+
+          <!-- Send Destination & Actions -->
+          <div class="destination-section">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">
+                Playlist Name
+              </label>
+              <button class="clear-btn" onclick="openFetchPlaylistModal()" style="font-size: 11px; color: var(--accent-blue); display: flex; align-items: center; gap: 4px;" title="Import songs from any Spotify Playlist">
+                📂 Import Playlist
+              </button>
+            </div>
+            <input 
+              type="text" 
+              id="playlistNameInput" 
+              class="playlist-name-input" 
+              placeholder="e.g. My Favorite Movie Themes" 
+              value="Soundtrack Curator Picks" 
+            />
+
+            <input 
+              type="text" 
+              id="playlistDescInput" 
+              class="playlist-name-input" 
+              placeholder="Description (optional)" 
+              value="Curated with Soundtrack Curator Studio" 
+              style="font-size: 12px; padding: 7px 10px;"
+            />
+
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer;">
+              <input type="checkbox" id="playlistPublicCheck" style="accent-color: var(--spotify-green);" />
+              <span>Make playlist public on Spotify</span>
+            </label>
+
+            <!-- Primary Send Action: Create Playlist -->
+            <button class="action-btn-primary" id="createPlaylistBtn" onclick="createSpotifyPlaylist()" disabled>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.563.387-.857.207-2.35-1.435-5.308-1.76-8.792-.963-.335.077-.67-.133-.746-.468-.077-.334.132-.67.467-.746 3.808-.87 7.076-.496 9.72 1.115.295.18.388.563.208.855zm1.224-2.72c-.226.367-.708.482-1.075.257-2.687-1.652-6.785-2.131-9.965-1.166-.413.127-.848-.106-.973-.517-.125-.413.108-.848.52-0.973 3.632-1.102 8.147-.568 11.235 1.33.368.226.483.707.258 1.069zm.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71c-.494.15-1.018-.129-1.167-.624-.15-.495.13-1.018.625-1.167 3.532-1.073 9.404-.866 13.115 1.337.445.264.59.838.327 1.282-.264.443-.838.59-1.282.327z"/>
+              </svg>
+              <span id="createPlaylistBtnText">Create Spotify Playlist (0 Songs)</span>
+            </button>
+
+            <!-- Append to Existing Playlist -->
+            <div style="border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 10px; display: flex; flex-direction: column; gap: 6px;">
+              <label style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">
+                Or Add to Existing Playlist
+              </label>
+              <div style="display: flex; gap: 6px;">
+                <select id="userPlaylistsSelect" class="playlist-name-input" style="flex: 1; padding: 6px 10px; font-size: 12px; min-width: 0;" onchange="document.getElementById('appendPlaylistBtn').disabled = !this.value || stagedSongs.length === 0;">
+                  <option value="">-- Choose Your Playlist --</option>
+                </select>
+                <button class="action-btn-secondary" id="appendPlaylistBtn" onclick="appendToSelectedPlaylist()" style="padding: 6px 12px; font-size: 12px;" disabled>
+                  ➕ Add Songs
+                </button>
+              </div>
+            </div>
+
+            <!-- Secondary Send Action: Add to Spotify Queue -->
+            <button class="action-btn-secondary" id="queueBtn" onclick="queueSpotifyTracks()" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span>Send Songs to Spotify Queue</span>
+            </button>
+
+            <!-- Direct Spotify Link -->
+            <a href="https://open.spotify.com" id="spotifyDirectLink" target="_blank" rel="noopener noreferrer" class="action-btn-secondary" style="text-decoration: none; justify-content: center; font-size: 12px; gap: 8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="color: var(--spotify-green);">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+              </svg>
+              <span id="spotifyDirectLinkText">Open in Spotify ↗</span>
+            </a>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- Toast Notifications Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Fetch Playlist Modal -->
+  <div class="modal-backdrop" id="fetchPlaylistModal" onclick="if(event.target===this) closeFetchPlaylistModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+          </svg>
+          <span>Fetch Spotify Playlist</span>
+        </div>
+        <button class="modal-close" onclick="closeFetchPlaylistModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-tabs">
+          <button class="modal-tab active" id="tabFetchUrl" onclick="switchFetchTab('url')">🔗 By Link / ID</button>
+          <button class="modal-tab" id="tabFetchMine" onclick="switchFetchTab('mine')">👤 My Playlists</button>
+        </div>
+
+        <!-- Tab 1: By URL / ID -->
+        <div id="fetchTabUrlContent" style="display: flex; flex-direction: column; gap: 12px;">
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+            Paste any Spotify Playlist link (or ID) to inspect its songs and stage them into your Send Box:
+          </p>
+          <div style="display: flex; gap: 8px;">
+            <input 
+              type="text" 
+              id="fetchUrlInput" 
+              class="playlist-name-input" 
+              style="flex: 1;" 
+              placeholder="e.g. https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M"
+              onkeydown="if(event.key==='Enter') fetchPlaylistByUrl()"
+            />
+            <button class="action-btn-primary" id="fetchUrlBtn" onclick="fetchPlaylistByUrl()" style="padding: 10px 18px; font-size: 13px;">
+              Fetch Songs
+            </button>
+          </div>
+
+          <!-- Preview Area -->
+          <div id="fetchedPlaylistPreview" style="display: none; flex-direction: column; gap: 12px; margin-top: 6px;"></div>
+        </div>
+
+        <!-- Tab 2: My Spotify Playlists -->
+        <div id="fetchTabMineContent" style="display: none; flex-direction: column; gap: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; color: var(--text-muted);">Your Saved & Created Playlists:</span>
+            <button class="clear-btn" onclick="loadUserPlaylists(true)" style="color: var(--spotify-green); font-size: 12px;">🔄 Refresh List</button>
+          </div>
+          <div id="myPlaylistsList" style="display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto; padding-right: 4px;">
+            <div style="text-align: center; padding: 24px; color: var(--text-dim); font-size: 13px;">Loading your playlists...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="action-btn-secondary" onclick="closeFetchPlaylistModal()" style="padding: 8px 18px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spotify Auth Assistance Modal -->
+  <div class="modal-backdrop" id="authHelperModal" onclick="if(event.target===this) closeAuthHelperModal()">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span style="color: var(--spotify-green);">🔐</span>
+          <span>Connect Spotify Account</span>
+        </div>
+        <button class="modal-close" onclick="closeAuthHelperModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+          Authorize your Spotify account to unlock playlist creation, playback queueing, and personal playlist fetching.<br /><br />
+          • Click <strong>Open Spotify Authorization</strong> to login.<br />
+          • When prompted, agree to the permissions.<br />
+          • If your browser lands on a page showing <em>connection refused</em>, simply copy that full address URL (or the code) and paste it below:
+        </p>
+
+        <a id="authHelperLink" href="#" target="_blank" class="action-btn-primary" style="text-decoration: none; text-align: center; justify-content: center; margin-top: 4px;">
+          Open Spotify Authorization Page ↗
+        </a>
+
+        <div style="border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 14px; margin-top: 6px; display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">
+            Paste Callback URL or Code:
+          </label>
+          <div style="display: flex; gap: 8px;">
+            <input 
+              type="text" 
+              id="authCodeInput" 
+              class="playlist-name-input" 
+              placeholder="Paste http://127.0.0.1:8888/callback?code=... here" 
+              style="flex: 1; font-size: 12px;"
+              onkeydown="if(event.key==='Enter') submitManualOAuthCode()"
+            />
+            <button class="action-btn-secondary" id="submitAuthCodeBtn" onclick="submitManualOAuthCode()" style="padding: 8px 14px; font-size: 12px;">
+              Connect
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn-secondary" onclick="closeAuthHelperModal()" style="padding: 8px 18px;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State management
+    let currentMode = 'movies'; // 'movies', 'actors', 'singers', or 'songs'
+    let stagedSongs = [];
+    let activeItems = [];
+    let currentArtist = null;
+    let currentActor = null;
+    let lastQuery = '';
+
+    // Rank options mapping for Movies, Actors, Singers, and Songs
+    const movieRankOptions = [
+      { value: 'date_desc', label: '📅 Release Date (Newest first)' },
+      { value: 'date_asc', label: '📅 Release Date (Oldest first)' },
+      { value: 'popularity', label: '🔥 TMDb Popularity' },
+      { value: 'rating', label: '⭐ Rating (Vote Average)' },
+      { value: 'title', label: '🔤 Title (A - Z)' }
+    ];
+
+    const actorRankOptions = [
+      { value: 'popularity', label: '🔥 TMDb Popularity (Highest)' },
+      { value: 'date_desc', label: '📅 Release Date (Newest first)' },
+      { value: 'date_asc', label: '📅 Release Date (Oldest first)' },
+      { value: 'rating', label: '⭐ Rating (Vote Average)' },
+      { value: 'title', label: '🔤 Title (A - Z)' }
+    ];
+
+    const singerRankOptions = [
+      { value: 'popularity', label: '🔥 Spotify Popularity (Highest)' },
+      { value: 'date_desc', label: '📅 Release Date (Newest first)' },
+      { value: 'date_asc', label: '📅 Release Date (Oldest first)' },
+      { value: 'name', label: '🔤 Song Title (A - Z)' }
+    ];
+
+    const songRankOptions = [
+      { value: 'popularity', label: '🔥 Spotify Popularity (Highest)' },
+      { value: 'date_desc', label: '📅 Release Date (Newest first)' },
+      { value: 'date_asc', label: '📅 Release Date (Oldest first)' },
+      { value: 'duration_desc', label: '⏱️ Duration (Longest)' },
+      { value: 'duration_asc', label: '⏱️ Duration (Shortest)' },
+      { value: 'name', label: '🔤 Song Title (A - Z)' },
+      { value: 'artist', label: '👤 Artist Name (A - Z)' }
+    ];
+
+    let currentAuthUrl = '';
+    let userPlaylistsCache = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateRankDropdown();
+      checkUserProfile();
+
+      // Check for OAuth redirect params from http://127.0.0.1:8888/callback or 8000/callback
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('connected') === 'true') {
+        showToast('Spotify account connected successfully! 🎉');
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setTimeout(checkUserProfile, 600);
+      } else if (urlParams.get('auth_error')) {
+        showToast(`Spotify connection notice: ${urlParams.get('auth_error')}`, true);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      document.getElementById('searchInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') performSearch();
+      });
+    });
+
+    // Switch between Movies, Actors, Singers, and Songs modes
+    function switchMode(mode) {
+      currentMode = mode;
+      const moviesBtn = document.getElementById('modeMoviesBtn');
+      const actorsBtn = document.getElementById('modeActorsBtn');
+      const singersBtn = document.getElementById('modeSingersBtn');
+      const songsBtn = document.getElementById('modeSongsBtn');
+      const searchInput = document.getElementById('searchInput');
+      const heroTitle = document.getElementById('heroTitle');
+      const heroSubtitle = document.getElementById('heroSubtitle');
+
+      if (moviesBtn) moviesBtn.classList.toggle('active', mode === 'movies');
+      if (actorsBtn) actorsBtn.classList.toggle('active', mode === 'actors');
+      if (singersBtn) singersBtn.classList.toggle('active', mode === 'singers');
+      if (songsBtn) songsBtn.classList.toggle('active', mode === 'songs');
+
+      if (mode === 'movies') {
+        searchInput.placeholder = 'Search movie title (e.g. Inception, Interstellar, Titanic, Oppenheimer)...';
+        heroTitle.textContent = 'Explore Movie Soundtracks & Songs';
+        heroSubtitle.textContent = 'Search any movie title to discover official soundtrack albums and songs with complete song counts.';
+        document.getElementById('emptyIcon').textContent = '🎬';
+        document.getElementById('emptyTitle').textContent = 'Ready to Explore Movies';
+        document.getElementById('emptyDesc').textContent = 'Type a movie title above to discover soundtracks and stage songs into your Send Box.';
+      } else if (mode === 'actors') {
+        searchInput.placeholder = 'Search actor name (e.g. Cillian Murphy, Shah Rukh Khan, Leonardo DiCaprio)...';
+        heroTitle.textContent = 'Explore Actor Filmographies & Songs';
+        heroSubtitle.textContent = 'Search any actor to discover their career films, roles, and soundtrack songs with full song counts.';
+        document.getElementById('emptyIcon').textContent = '🎭';
+        document.getElementById('emptyTitle').textContent = 'Ready to Explore Actors';
+        document.getElementById('emptyDesc').textContent = 'Type an actor name to view their complete filmography and discover soundtrack songs.';
+      } else if (mode === 'singers') {
+        searchInput.placeholder = 'Search singer or artist (e.g. Arijit Singh, Taylor Swift, Hans Zimmer)...';
+        heroTitle.textContent = 'Explore Singers & Artists';
+        heroSubtitle.textContent = 'Search any singer or artist to explore top songs, discography, and soundtrack appearances.';
+        document.getElementById('emptyIcon').textContent = '🎤';
+        document.getElementById('emptyTitle').textContent = 'Ready to Explore Singers';
+        document.getElementById('emptyDesc').textContent = 'Type a singer or music artist name to view their top songs and soundtrack contributions.';
+      } else {
+        searchInput.placeholder = 'Search song title (e.g. Can You Hear The Music, Shape of You)...';
+        heroTitle.textContent = 'Explore Songs';
+        heroSubtitle.textContent = 'Directly search Spotify songs with real-time popularity rankings, durations, and release dates.';
+        document.getElementById('emptyIcon').textContent = '🎵';
+        document.getElementById('emptyTitle').textContent = 'Ready to Explore Songs';
+        document.getElementById('emptyDesc').textContent = 'Type a song or theme name to view songs and stage them directly.';
+      }
+
+      updateRankDropdown();
+
+      // If user had searched something, re-trigger search in new mode
+      if (searchInput.value.trim()) {
+        performSearch();
+      }
+    }
+
+    function updateRankDropdown() {
+      const select = document.getElementById('rankSortSelect');
+      let options = movieRankOptions;
+      if (currentMode === 'actors') options = actorRankOptions;
+      else if (currentMode === 'singers') options = singerRankOptions;
+      else if (currentMode === 'songs') options = songRankOptions;
+      select.innerHTML = options.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+    }
+
+    async function checkUserProfile() {
+      try {
+        const res = await fetch('/api/me');
+        const data = await res.json();
+        const pill = document.getElementById('userStatusPill');
+        if (data.authenticated && data.display_name) {
+          pill.innerHTML = `
+            <div class="status-dot"></div>
+            <span>Connected: ${escapeHtml(data.display_name)}</span>
+          `;
+          if (data.auth_url) currentAuthUrl = data.auth_url;
+          loadUserPlaylists();
+        } else if (data.auth_url) {
+          currentAuthUrl = data.auth_url;
+          pill.innerHTML = `
+            <button onclick="openAuthHelperModal('${escapeHtml(data.auth_url)}')" style="background:transparent; border:none; color:inherit; font-family:inherit; cursor:pointer; display:flex; align-items:center; gap:8px;" title="Click to connect Spotify account">
+              <div class="status-dot" style="background: #eab308; box-shadow: 0 0 8px #eab308;"></div>
+              <span>Connect Spotify</span>
+            </button>
+          `;
+        }
+      } catch (err) {
+        console.warn('Could not verify Spotify user profile:', err);
+      }
+    }
+
+    // Called when user changes limit or rank select
+    function onFilterOrLimitChange() {
+      if (activeItems.length > 0) {
+        applySortingAndRender();
+        
+      }
+    }
+
+
+    async function performSearch() {
+      const input = document.getElementById('searchInput');
+      const query = input.value.trim();
+      if (!query) return;
+
+      lastQuery = query;
+      const limit = document.getElementById('limitSelect').value;
+      const rankSort = document.getElementById('rankSortSelect').value;
+      const lang = document.getElementById('langSelect').value;
+
+      const resContainer = document.getElementById('results');
+      const btn = document.getElementById('searchBtn');
+      const btnText = document.getElementById('searchBtnText');
+
+      // Loading state
+      btnText.textContent = 'Searching...';
+      btn.style.opacity = '0.7';
+      btn.disabled = true;
+
+      // Render skeleton loaders
+      resContainer.innerHTML = Array(3).fill(0).map(() => `
+        <div class="movie-card skeleton" style="height: 180px; border: none;"></div>
+      `).join('');
+
+      try {
+        let endpoint = '';
+        if (currentMode === 'movies') {
+          endpoint = `/api/search/movies?query=${encodeURIComponent(query)}&limit=${limit}&sort_by=${rankSort}&lang=${lang}`;
+        } else if (currentMode === 'actors') {
+          endpoint = `/api/search/actors?query=${encodeURIComponent(query)}&limit=${limit}&sort_by=${rankSort}&lang=${lang}`;
+        } else if (currentMode === 'singers') {
+          endpoint = `/api/search/singers?query=${encodeURIComponent(query)}&limit=${limit}&sort_by=${rankSort}&lang=${lang}`;
+        } else {
+          endpoint = `/api/search/songs?query=${encodeURIComponent(query)}&limit=${limit}&sort_by=${rankSort}&lang=${lang}`;
+        }
+
+        const response = await fetch(endpoint);
+        const data = await response.json();
+
+        btnText.textContent = 'Explore';
+        btn.style.opacity = '1';
+        btn.disabled = false;
+
+        if (currentMode === 'movies') {
+          activeItems = data.movies || [];
+          currentArtist = null;
+          currentActor = null;
+          const totalSongs = activeItems.reduce((acc, m) => acc + (m.tracks ? m.tracks.length : 0), 0);
+          document.getElementById('timelineTitle').innerHTML = `
+            ${escapeHtml(data.display_name || query)}
+            <span class="timeline-badge" id="resultsCountBadge">${activeItems.length} Movies (${totalSongs} Songs)</span>
+          `;
+          document.getElementById('playlistNameInput').value = `${data.display_name || query} Soundtracks`;
+        } else if (currentMode === 'actors') {
+          activeItems = data.movies || [];
+          currentArtist = null;
+          currentActor = data.actor || null;
+          const actorName = currentActor ? currentActor.name : query;
+          const totalSongs = activeItems.reduce((acc, m) => acc + (m.tracks ? m.tracks.length : 0), 0);
+          document.getElementById('timelineTitle').innerHTML = `
+            ${escapeHtml(actorName)}
+            <span class="timeline-badge" id="resultsCountBadge">${activeItems.length} Movies (${totalSongs} Songs)</span>
+          `;
+          document.getElementById('playlistNameInput').value = `${actorName} — Career Filmography Songs`;
+        } else if (currentMode === 'singers') {
+          activeItems = data.tracks || [];
+          currentArtist = data.artist || null;
+          currentActor = null;
+          const artistName = currentArtist ? currentArtist.name : query;
+          document.getElementById('timelineTitle').innerHTML = `
+            ${escapeHtml(artistName)}
+            <span class="timeline-badge" id="resultsCountBadge">${activeItems.length} Songs</span>
+          `;
+          document.getElementById('playlistNameInput').value = `${artistName} Best Songs`;
+        } else {
+          activeItems = data.songs || [];
+          currentArtist = null;
+          currentActor = null;
+          document.getElementById('timelineTitle').innerHTML = `
+            Songs for "${escapeHtml(query)}"
+            <span class="timeline-badge" id="resultsCountBadge">${activeItems.length} Songs</span>
+          `;
+          document.getElementById('playlistNameInput').value = `${query} Songs Playlist`;
+        }
+
+        applySortingAndRender();
+        
+
+      } catch (err) {
+        btnText.textContent = 'Explore';
+        btn.style.opacity = '1';
+        btn.disabled = false;
+        resContainer.innerHTML = `
+          <div class="empty-prompt">
+            <div class="empty-prompt-icon">⚠️</div>
+            <h3>Search Error</h3>
+            <p style="color: #ef4444;">${escapeHtml(err.message)}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Sort active items client-side according to rankSortSelect and render
+    function applySortingAndRender() {
+      const rankSort = document.getElementById('rankSortSelect').value;
+      const resContainer = document.getElementById('results');
+
+      if (!activeItems || activeItems.length === 0) {
+        resContainer.innerHTML = `
+          <div class="empty-prompt">
+            <div class="empty-prompt-icon">🔍</div>
+            <h3>No results found</h3>
+            <p>We couldn't locate any ${currentMode} for "${escapeHtml(lastQuery)}". Try another search.</p>
+          </div>
+        `;
+        document.getElementById('resultsCountBadge').textContent = '0 Songs';
+        return;
+      }
+
+      // Sort client-side
+      if (currentMode === 'movies' || currentMode === 'actors') {
+        if (rankSort === 'date_desc') {
+          activeItems.sort((a, b) => (b.release_date || '0000').localeCompare(a.release_date || '0000'));
+        } else if (rankSort === 'date_asc') {
+          activeItems.sort((a, b) => (a.release_date || '9999').localeCompare(b.release_date || '9999'));
+        } else if (rankSort === 'popularity') {
+          activeItems.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+        } else if (rankSort === 'rating') {
+          activeItems.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
+        } else if (rankSort === 'title') {
+          activeItems.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+        }
+        if (currentMode === 'actors') {
+          renderActors();
+        } else {
+          renderMovies();
+        }
+      } else if (currentMode === 'singers') {
+        if (rankSort === 'popularity') {
+          activeItems.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+        } else if (rankSort === 'date_desc') {
+          activeItems.sort((a, b) => (b.release_date || '0000').localeCompare(a.release_date || '0000'));
+        } else if (rankSort === 'date_asc') {
+          activeItems.sort((a, b) => (a.release_date || '9999').localeCompare(b.release_date || '9999'));
+        } else if (rankSort === 'name') {
+          activeItems.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        }
+        renderSingers();
+      } else {
+        if (rankSort === 'popularity') {
+          activeItems.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+        } else if (rankSort === 'date_desc') {
+          activeItems.sort((a, b) => (b.release_date || '0000').localeCompare(a.release_date || '0000'));
+        } else if (rankSort === 'date_asc') {
+          activeItems.sort((a, b) => (a.release_date || '9999').localeCompare(b.release_date || '9999'));
+        } else if (rankSort === 'duration_desc') {
+          activeItems.sort((a, b) => (b.duration_ms || 0) - (a.duration_ms || 0));
+        } else if (rankSort === 'duration_asc') {
+          activeItems.sort((a, b) => (a.duration_ms || 0) - (b.duration_ms || 0));
+        } else if (rankSort === 'name') {
+          activeItems.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        } else if (rankSort === 'artist') {
+          activeItems.sort((a, b) => (a.artist || '').localeCompare(b.artist || ''));
+        }
+        renderSongs();
+      }
+    }
+
+    // Render Movie Cards (TMDB movies with on-demand Spotify soundtrack loading)
+    function renderMovies() {
+      const resContainer = document.getElementById('results');
+      resContainer.innerHTML = '';
+      const totalSongs = activeItems.reduce((acc, m) => acc + (m.tracks ? m.tracks.length : 0), 0);
+      document.getElementById('resultsCountBadge').textContent = `${activeItems.length} Movies (${totalSongs} Songs)`;
+
+      activeItems.forEach((m, mIndex) => {
+        const card = document.createElement('article');
+        card.className = 'movie-card';
+        card.id = `movie-card-${mIndex}`;
+
+        const year = m.release_date ? m.release_date.split('-')[0] : 'TBA';
+        const hasTracks = Array.isArray(m.tracks) && m.tracks.length > 0;
+
+        card.innerHTML = `
+          <div class="poster-box" style="cursor: pointer;" onclick="toggleMovieSoundtracks(${mIndex}, '${escapeHtml(m.title)}')" title="Click to view soundtrack songs for ${escapeHtml(m.title)}">
+            ${m.poster ? `
+              <img class="poster-img" src="${m.poster}" alt="${escapeHtml(m.title)}" loading="lazy" />
+            ` : `
+              <div class="poster-fallback">🎬</div>
+            `}
+          </div>
+          <div class="movie-content">
+            <div class="movie-meta-top">
+              <span class="year-chip">${year}</span>
+              ${m.vote_average ? `<span class="rating-chip">★ ${m.vote_average}</span>` : ''}
+              ${m.popularity ? `<span class="popularity-chip">🔥 Pop ${m.popularity}</span>` : ''}
+            </div>
+            <h4 class="movie-title" style="cursor: pointer;" onclick="toggleMovieSoundtracks(${mIndex}, '${escapeHtml(m.title)}')" title="Click to load soundtrack songs">${escapeHtml(m.title)}</h4>
+            ${m.character ? `<p class="movie-role">Role: <strong>${escapeHtml(m.character)}</strong></p>` : ''}
+            ${m.overview ? `<p class="movie-synopsis">${escapeHtml(m.overview)}</p>` : ''}
+            
+            <div class="tracks-section" id="tracks-section-${mIndex}">
+              <div class="tracks-header">
+                <span class="tracks-label">
+                  🎵 Soundtracks <span id="tracks-count-${mIndex}">(${hasTracks ? m.tracks.length + ' Songs' : 'Click to load songs'})</span>
+                </span>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <button class="view-soundtracks-btn" id="btn-toggle-tracks-${mIndex}" onclick="toggleMovieSoundtracks(${mIndex}, '${escapeHtml(m.title)}')">
+                    ${hasTracks ? '▼ Hide Songs' : '🎵 Show Songs'}
+                  </button>
+                  <button class="add-all-btn" id="btn-add-all-${mIndex}" onclick="addAllTracksFromMovie(${mIndex})" style="${hasTracks ? '' : 'display: none;'}">
+                    + Add All Songs to Send Box
+                  </button>
+                </div>
+              </div>
+              <div id="tracks-container-${mIndex}" style="${hasTracks ? '' : 'display: none;'}">
+                ${hasTracks ? renderMovieTracksListHtml(mIndex, m.tracks) : ''}
+              </div>
+            </div>
+          </div>
+        `;
+
+        resContainer.appendChild(card);
+      });
+    }
+
+    // Render Actor Filmography Mode
+    function renderActors() {
+      const resContainer = document.getElementById('results');
+      resContainer.innerHTML = '';
+      const totalSongs = activeItems.reduce((acc, m) => acc + (m.tracks ? m.tracks.length : 0), 0);
+      document.getElementById('resultsCountBadge').textContent = `${activeItems.length} Movies (${totalSongs} Songs)`;
+
+      // Render Actor Hero Banner if available
+      if (currentActor) {
+        const hero = document.createElement('div');
+        hero.className = 'artist-hero-card';
+        hero.innerHTML = `
+          <img src="${currentActor.profile_path || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160'}" class="artist-hero-avatar" alt="${escapeHtml(currentActor.name)}" />
+          <div class="artist-hero-info">
+            <h3 class="artist-hero-name">${escapeHtml(currentActor.name)}</h3>
+            <div class="artist-hero-meta">
+              ${currentActor.birthday ? `<span>🎂 Born ${escapeHtml(currentActor.birthday)}</span>` : ''}
+              ${currentActor.place_of_birth ? `<span>📍 ${escapeHtml(currentActor.place_of_birth)}</span>` : ''}
+              ${currentActor.popularity ? `<span>🔥 TMDb Pop ${currentActor.popularity}</span>` : ''}
+              <span>🎬 ${activeItems.length} Movies</span>
+            </div>
+            ${currentActor.biography ? `
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; max-height: 60px; overflow: hidden; text-overflow: ellipsis;">
+                ${escapeHtml(currentActor.biography)}
+              </p>
+            ` : ''}
+          </div>
+          <button class="action-btn-primary" onclick="addAllActorSongs()" style="padding: 10px 18px; font-size: 13px; align-self: center; white-space: nowrap;">
+            📥 Stage All Actor Songs
+          </button>
+        `;
+        resContainer.appendChild(hero);
+      }
+
+      // Render Filmography Movies
+      activeItems.forEach((m, mIndex) => {
+        const card = document.createElement('article');
+        card.className = 'movie-card';
+        card.id = `movie-card-${mIndex}`;
+
+        const year = m.release_date ? m.release_date.split('-')[0] : 'TBA';
+        const hasTracks = Array.isArray(m.tracks) && m.tracks.length > 0;
+
+        card.innerHTML = `
+          <div class="poster-box" style="cursor: pointer;" onclick="toggleMovieSoundtracks(${mIndex}, '${escapeHtml(m.title)}')" title="Click to view soundtrack songs for ${escapeHtml(m.title)}">
+            ${m.poster ? `
+              <img class="poster-img" src="${m.poster}" alt="${escapeHtml(m.title)}" loading="lazy" />
+            ` : `
+              <div class="poster-fallback">🎬</div>
+            `}
+          </div>
+          <div class="movie-content">
+            <div class="movie-meta-top">
+              <span class="year-chip">${year}</span>
+              ${m.vote_average ? `<span class="rating-chip">★ ${m.vote_average}</span>` : ''}
+              ${m.popularity ? `<span class="popularity-chip">🔥 Pop ${m.popularity}</span>` : ''}
+            </div>
+            <h4 class="movie-title" style="cursor: pointer;" onclick="toggleMovieSoundtracks(${mIndex}, '${escapeHtml(m.title)}')" title="Click to load soundtrack songs">${escapeHtml(m.title)}</h4>
+            ${m.character ? `<p class="movie-role">Role: <strong>${escapeHtml(m.character)}</strong></p>` : ''}
+            ${m.overview ? `<p class="movie-synopsis">${escapeHtml(m.overview)}</p>` : ''}
+            
+            <div class="tracks-section" id="tracks-section-${mIndex}">
+              <div class="tracks-header">
+                <span class="tracks-label">
+                  🎵 Soundtracks <span id="tracks-count-${mIndex}">(${hasTracks ? m.tracks.length + ' Songs' : 'Click to load songs'})</span>
+                </span>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <button class="view-soundtracks-btn" id="btn-toggle-tracks-${mIndex}" onclick="toggleMovieSoundtracks(${mIndex}, '${escapeHtml(m.title)}')">
+                    ${hasTracks ? '▼ Hide Songs' : '🎵 Show Songs'}
+                  </button>
+                  <button class="add-all-btn" id="btn-add-all-${mIndex}" onclick="addAllTracksFromMovie(${mIndex})" style="${hasTracks ? '' : 'display: none;'}">
+                    + Add All Songs to Send Box
+                  </button>
+                </div>
+              </div>
+              <div id="tracks-container-${mIndex}" style="${hasTracks ? '' : 'display: none;'}">
+                ${hasTracks ? renderMovieTracksListHtml(mIndex, m.tracks) : ''}
+              </div>
+            </div>
+          </div>
+        `;
+
+        resContainer.appendChild(card);
+      });
+    }
+
+    function addAllActorSongs() {
+      let addedCount = 0;
+      activeItems.forEach((movie, mIdx) => {
+        if (movie.tracks && movie.tracks.length > 0) {
+          movie.tracks.forEach((track, tIdx) => {
+            if (!stagedSongs.some(s => s.uri === track.uri)) {
+              stagedSongs.push({
+                name: track.name,
+                artist: track.artist,
+                uri: track.uri,
+                album_cover: track.album_cover,
+                movie: movie.title
+              });
+              const btn = document.getElementById(`btn-movie-${mIdx}-${tIdx}`);
+              if (btn) {
+                btn.className = 'add-song-btn added';
+                btn.innerHTML = '✓ Added';
+              }
+              addedCount++;
+            }
+          });
+        }
+      });
+      updateSendBoxUI();
+      showToast(`Added ${addedCount} songs from ${currentActor ? currentActor.name : 'actor'} filmography!`);
+    }
+
+    function renderMovieTracksListHtml(mIndex, tracks) {
+      if (!tracks || tracks.length === 0) {
+        return `<div class="empty-tracks-msg">No direct Spotify songs found for this title.</div>`;
+      }
+      return `
+        <ul class="tracks-list">
+          ${tracks.map((t, tIndex) => {
+            const isStaged = stagedSongs.some(s => s.uri === t.uri);
+            return `
+              <li class="track-row" id="track-row-${mIndex}-${tIndex}">
+                <div class="track-left">
+                  <img class="track-thumb" src="${t.album_cover || 'https://via.placeholder.com/36/121824/64748b?text=♪'}" alt="cover" />
+                  <div class="track-details">
+                    <span class="track-name" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</span>
+                    <span class="track-artist">${escapeHtml(t.artist)}</span>
+                  </div>
+                </div>
+                <div class="track-actions">
+                  ${t.spotify_url ? `
+                    <a href="${t.spotify_url}" target="_blank" rel="noopener noreferrer" class="spotify-link-btn" title="Open song in Spotify">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                      </svg>
+                    </a>
+                  ` : ''}
+                  <button class="play-song-btn" onclick="playSong('${escapeHtml(t.uri)}')" title="Play on active Spotify device">▶</button>
+                  <button 
+                    class="add-song-btn ${isStaged ? 'added' : ''}" 
+                    id="btn-movie-${mIndex}-${tIndex}"
+                    onclick="toggleAddMovieTrack(${mIndex}, ${tIndex})"
+                    title="${isStaged ? 'Remove from Send Box' : 'Add to Send Box'}"
+                  >
+                    ${isStaged ? '✓ Added' : '+ Send'}
+                  </button>
+                </div>
+              </li>
+            `;
+          }).join('')}
+        </ul>
+      `;
+    }
+
+    async function toggleMovieSoundtracks(mIndex, movieTitle) {
+      const container = document.getElementById(`tracks-container-${mIndex}`);
+      const toggleBtn = document.getElementById(`btn-toggle-tracks-${mIndex}`);
+      const addAllBtn = document.getElementById(`btn-add-all-${mIndex}`);
+      const countSpan = document.getElementById(`tracks-count-${mIndex}`);
+      const movie = activeItems[mIndex];
+      if (!movie) return;
+
+      // If already open and has tracks, toggle close
+      if (container.style.display !== 'none' && movie.tracks && movie.tracks.length > 0) {
+        container.style.display = 'none';
+        toggleBtn.textContent = '🎵 Show Songs';
+        return;
+      }
+
+      // If tracks already loaded in memory, open instantly
+      if (movie.tracks && movie.tracks.length > 0) {
+        container.innerHTML = renderMovieTracksListHtml(mIndex, movie.tracks);
+        container.style.display = 'block';
+        toggleBtn.textContent = '▼ Hide Songs';
+        if (addAllBtn) addAllBtn.style.display = 'inline-flex';
+        return;
+      }
+
+      // Fetch tracks on demand
+      container.style.display = 'block';
+      container.innerHTML = `<div class="skeleton" style="height: 50px; border-radius: 6px; margin: 8px 0;"></div>`;
+      toggleBtn.textContent = 'Loading...';
+      toggleBtn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/movie/tracks?movie_title=${encodeURIComponent(movieTitle)}`);
+        const data = await res.json();
+        movie.tracks = data.tracks || [];
+        if (countSpan) countSpan.textContent = `(${movie.tracks.length} Songs)`;
+        container.innerHTML = renderMovieTracksListHtml(mIndex, movie.tracks);
+        toggleBtn.textContent = movie.tracks.length > 0 ? '▼ Hide Songs' : 'No Songs Found';
+        if (addAllBtn && movie.tracks.length > 0) addAllBtn.style.display = 'inline-flex';
+        
+        // Update header total songs count
+        const totalSongs = activeItems.reduce((acc, m) => acc + (m.tracks ? m.tracks.length : 0), 0);
+        document.getElementById('resultsCountBadge').textContent = `${activeItems.length} Movies (${totalSongs} Songs)`;
+      } catch (err) {
+        container.innerHTML = `<div class="empty-tracks-msg" style="color: #ef4444;">Error loading songs: ${escapeHtml(err.message)}</div>`;
+        toggleBtn.textContent = 'Retry';
+      } finally {
+        toggleBtn.disabled = false;
+      }
+    }
+
+    // Render Singers & Artists Mode
+    async function playSong(uri) {
+      if (!uri) return;
+      try {
+        const response = await fetch('/api/player/play', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ track_uri: uri })
+        });
+        const data = await response.json();
+        if (!data.success) {
+          if (data.need_auth) {
+            openAuthHelperModal(data.auth_url);
+            showToast("Please connect Spotify to play songs.", true);
+          } else {
+            showToast(data.error || "Failed to play song. Make sure Spotify is active on one of your devices.", true);
+          }
+        } else {
+          showToast("Playing song...");
+        }
+      } catch (err) {
+        showToast("Error connecting to server.", true);
+      }
+    }
+
+    function renderSingers() {
+      const resContainer = document.getElementById('results');
+      resContainer.innerHTML = '';
+      document.getElementById('resultsCountBadge').textContent = `${activeItems.length} Songs`;
+
+      // Render Artist Hero Banner if available
+      if (currentArtist) {
+        const hero = document.createElement('div');
+        hero.className = 'artist-hero-card';
+        hero.innerHTML = `
+          <img src="${currentArtist.image || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=160'}" class="artist-hero-avatar" alt="${escapeHtml(currentArtist.name)}" />
+          <div class="artist-hero-info">
+            <h3 class="artist-hero-name">${escapeHtml(currentArtist.name)}</h3>
+            <div class="artist-hero-meta">
+              ${currentArtist.followers ? `<span>👥 ${Number(currentArtist.followers).toLocaleString()} Followers</span>` : ''}
+              ${currentArtist.popularity ? `<span>🔥 Pop ${currentArtist.popularity}/100</span>` : ''}
+              ${currentArtist.genres && currentArtist.genres.length ? currentArtist.genres.map(g => `<span class="genre-chip">${escapeHtml(g)}</span>`).join('') : ''}
+              ${currentArtist.spotify_url ? `<a href="${currentArtist.spotify_url}" target="_blank" rel="noopener noreferrer" class="toast-link" style="margin-left: 0;">Open Profile ↗</a>` : ''}
+            </div>
+          </div>
+          <button class="action-btn-primary" onclick="addAllSingerTracks()" style="padding: 10px 18px; font-size: 13px; align-self: center;">
+            📥 Add All Songs
+          </button>
+        `;
+        resContainer.appendChild(hero);
+      }
+
+      // Render Song Cards for this Singer
+      activeItems.forEach((s, sIndex) => {
+        const isStaged = stagedSongs.some(item => item.uri === s.uri);
+        const card = document.createElement('div');
+        card.className = 'song-card';
+
+        const minutes = Math.floor(s.duration_ms / 60000);
+        const seconds = ((s.duration_ms % 60000) / 1000).toFixed(0).padStart(2, '0');
+        const durationFormatted = `${minutes}:${seconds}`;
+
+        card.innerHTML = `
+          <div class="song-left">
+            <img class="song-cover" src="${s.album_cover || 'https://via.placeholder.com/48/121824/64748b?text=♪'}" alt="cover" />
+            <div class="song-info">
+              <span class="song-title" title="${escapeHtml(s.name)}">${escapeHtml(s.name)}</span>
+              <span class="song-sub">
+                <strong>${escapeHtml(s.artist)}</strong>
+                <span>•</span>
+                <span>${escapeHtml(s.album_name)}</span>
+                ${s.release_date ? `<span>•</span><span>${s.release_date.split('-')[0]}</span>` : ''}
+              </span>
+            </div>
+          </div>
+
+          <div class="song-meta-chips">
+            <div class="popularity-meter" title="Spotify Popularity Score: ${s.popularity}/100">
+              <span>Pop ${s.popularity}</span>
+              <div class="popularity-bar">
+                <div class="popularity-fill" style="width: ${s.popularity}%"></div>
+              </div>
+            </div>
+            <span style="font-size: 12px; color: var(--text-dim);">${durationFormatted}</span>
+          </div>
+
+          <div class="track-actions">
+            ${s.spotify_url ? `
+              <a href="${s.spotify_url}" target="_blank" rel="noopener noreferrer" class="spotify-link-btn" title="Open in Spotify">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                </svg>
+              </a>
+            ` : ''}
+            <button class="play-song-btn" onclick="playSong('${escapeHtml(s.uri)}')" title="Play on active Spotify device">▶</button>
+            <button 
+              class="add-song-btn ${isStaged ? 'added' : ''}" 
+              id="btn-singer-${sIndex}"
+              onclick="toggleAddSingerTrack(${sIndex})"
+            >
+              ${isStaged ? '✓ Added' : '+ Send'}
+            </button>
+          </div>
+        `;
+
+        resContainer.appendChild(card);
+      });
+    }
+
+    // Render Direct Songs Mode
+    function renderSongs() {
+      const resContainer = document.getElementById('results');
+      resContainer.innerHTML = '';
+      document.getElementById('resultsCountBadge').textContent = `${activeItems.length} Songs`;
+
+      activeItems.forEach((s, sIndex) => {
+        const isStaged = stagedSongs.some(item => item.uri === s.uri);
+        const card = document.createElement('div');
+        card.className = 'song-card';
+        
+
+        const minutes = Math.floor(s.duration_ms / 60000);
+        const seconds = ((s.duration_ms % 60000) / 1000).toFixed(0).padStart(2, '0');
+        const durationFormatted = `${minutes}:${seconds}`;
+
+        card.innerHTML = `
+          <div class="song-left">
+            <img class="song-cover" src="${s.album_cover || 'https://via.placeholder.com/48/121824/64748b?text=♪'}" alt="cover" />
+            <div class="song-info">
+              <span class="song-title" title="${escapeHtml(s.name)}">${escapeHtml(s.name)}</span>
+              <span class="song-sub">
+                <strong>${escapeHtml(s.artist)}</strong>
+                <span>•</span>
+                <span>${escapeHtml(s.album_name)}</span>
+                ${s.release_date ? `<span>•</span><span>${s.release_date.split('-')[0]}</span>` : ''}
+              </span>
+            </div>
+          </div>
+
+          <div class="song-meta-chips">
+            <div class="popularity-meter" title="Spotify Popularity Score: ${s.popularity}/100">
+              <span>Pop ${s.popularity}</span>
+              <div class="popularity-bar">
+                <div class="popularity-fill" style="width: ${s.popularity}%"></div>
+              </div>
+            </div>
+            <span style="font-size: 12px; color: var(--text-dim);">${durationFormatted}</span>
+          </div>
+
+          <div class="track-actions">
+            ${s.spotify_url ? `
+              <a href="${s.spotify_url}" target="_blank" rel="noopener noreferrer" class="spotify-link-btn" title="Open in Spotify">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                </svg>
+              </a>
+            ` : ''}
+            <button class="play-song-btn" onclick="playSong('${escapeHtml(s.uri)}')" title="Play on active Spotify device">▶</button>
+            <button 
+              class="add-song-btn ${isStaged ? 'added' : ''}" 
+              id="btn-song-${sIndex}"
+              onclick="toggleAddDirectSong(${sIndex})"
+            >
+              ${isStaged ? '✓ Added' : '+ Send'}
+            </button>
+          </div>
+        `;
+
+        resContainer.appendChild(card);
+      });
+    }
+
+    // Toggle track addition from Movie (with instant Remove support)
+    function toggleAddMovieTrack(movieIdx, trackIdx) {
+      const movie = activeItems[movieIdx];
+      const track = movie.tracks[trackIdx];
+      const btn = document.getElementById(`btn-movie-${movieIdx}-${trackIdx}`);
+
+      const existingIndex = stagedSongs.findIndex(s => s.uri === track.uri);
+      if (existingIndex > -1) {
+        stagedSongs.splice(existingIndex, 1);
+        if (btn) {
+          btn.className = 'add-song-btn';
+          btn.innerHTML = '+ Send';
+        }
+        showToast(`Removed "${track.name}"`);
+      } else {
+        stagedSongs.push({
+          name: track.name,
+          artist: track.artist,
+          uri: track.uri,
+          album_cover: track.album_cover,
+          movie: movie.title
+        });
+        if (btn) {
+          btn.className = 'add-song-btn added';
+          btn.innerHTML = '✓ Added';
+        }
+        showToast(`Added "${track.name}" to Send Box!`, false, null, track.uri);
+      }
+      updateSendBoxUI();
+    }
+
+    // Toggle track addition from Singer mode
+    function toggleAddSingerTrack(sIndex) {
+      const track = activeItems[sIndex];
+      const btn = document.getElementById(`btn-singer-${sIndex}`);
+
+      const existingIndex = stagedSongs.findIndex(s => s.uri === track.uri);
+      if (existingIndex > -1) {
+        stagedSongs.splice(existingIndex, 1);
+        if (btn) {
+          btn.className = 'add-song-btn';
+          btn.innerHTML = '+ Send';
+        }
+        showToast(`Removed "${track.name}"`);
+      } else {
+        stagedSongs.push({
+          name: track.name,
+          artist: track.artist,
+          uri: track.uri,
+          album_cover: track.album_cover,
+          movie: track.singer_name || (currentArtist ? currentArtist.name : 'Singer Track')
+        });
+        if (btn) {
+          btn.className = 'add-song-btn added';
+          btn.innerHTML = '✓ Added';
+        }
+        showToast(`Added "${track.name}" to Send Box!`, false, null, track.uri);
+      }
+      updateSendBoxUI();
+    }
+
+    function addAllSingerTracks() {
+      let addedCount = 0;
+      activeItems.forEach((track, sIdx) => {
+        if (!stagedSongs.some(s => s.uri === track.uri)) {
+          stagedSongs.push({
+            name: track.name,
+            artist: track.artist,
+            uri: track.uri,
+            album_cover: track.album_cover,
+            movie: currentArtist ? currentArtist.name : 'Singer Songs'
+          });
+          const btn = document.getElementById(`btn-singer-${sIdx}`);
+          if (btn) {
+            btn.className = 'add-song-btn added';
+            btn.innerHTML = '✓ Added';
+          }
+          addedCount++;
+        }
+      });
+      updateSendBoxUI();
+      showToast(`Added ${addedCount} songs to Send Box!`);
+    }
+
+    // Toggle song addition from Songs mode
+    function toggleAddDirectSong(songIdx) {
+      const track = activeItems[songIdx];
+      const btn = document.getElementById(`btn-song-${songIdx}`);
+
+      const existingIndex = stagedSongs.findIndex(s => s.uri === track.uri);
+      if (existingIndex > -1) {
+        stagedSongs.splice(existingIndex, 1);
+        if (btn) {
+          btn.className = 'add-song-btn';
+          btn.innerHTML = '+ Send';
+        }
+        showToast(`Removed "${track.name}"`);
+      } else {
+        stagedSongs.push({
+          name: track.name,
+          artist: track.artist,
+          uri: track.uri,
+          album_cover: track.album_cover,
+          movie: track.album_name || 'Spotify Song'
+        });
+        if (btn) {
+          btn.className = 'add-song-btn added';
+          btn.innerHTML = '✓ Added';
+        }
+        showToast(`Added "${track.name}" to Send Box!`, false, null, track.uri);
+      }
+      updateSendBoxUI();
+    }
+
+    function addAllTracksFromMovie(movieIdx) {
+      const movie = activeItems[movieIdx];
+      if (!movie || !movie.tracks) return;
+
+      let addedCount = 0;
+      movie.tracks.forEach((track, tIdx) => {
+        if (!stagedSongs.some(s => s.uri === track.uri)) {
+          stagedSongs.push({
+            name: track.name,
+            artist: track.artist,
+            uri: track.uri,
+            album_cover: track.album_cover,
+            movie: movie.title
+          });
+          const btn = document.getElementById(`btn-movie-${movieIdx}-${tIdx}`);
+          if (btn) {
+            btn.className = 'add-song-btn added';
+            btn.innerHTML = '✓ Added';
+          }
+          addedCount++;
+        }
+      });
+      updateSendBoxUI();
+      showToast(`Added ${addedCount} songs from "${movie.title}"`);
+    }
+
+    // Manual custom song quick addition in Send Box
+    async function searchAndAddCustomTrack() {
+      const input = document.getElementById('manualTrackInput');
+      const query = input.value.trim();
+      if (!query) return;
+
+      input.disabled = true;
+      try {
+        const res = await fetch(`/api/search/track?query=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        if (data.tracks && data.tracks.length > 0) {
+          const topTrack = data.tracks[0];
+          if (!stagedSongs.some(s => s.uri === topTrack.uri)) {
+            stagedSongs.push({
+              name: topTrack.name,
+              artist: topTrack.artist,
+              uri: topTrack.uri,
+              album_cover: topTrack.album_cover,
+              movie: 'Custom Added'
+            });
+            input.value = '';
+            updateSendBoxUI();
+            showToast(`Added "${topTrack.name}" to Send Box!`, false, null, topTrack.uri);
+          } else {
+            showToast(`Song "${topTrack.name}" already in Send Box.`);
+          }
+        } else {
+          showToast(`No songs found for "${query}"`, true);
+        }
+      } catch (e) {
+        showToast(`Error: ${e.message}`, true);
+      } finally {
+        input.disabled = false;
+        input.focus();
+      }
+    }
+
+    // Shuffle all staged songs in Send Box into a completely mixed new random order
+    function shuffleSendBoxSongs() {
+      if (stagedSongs.length <= 1) {
+        showToast(`Need at least 2 songs to shuffle (currently ${stagedSongs.length} song${stagedSongs.length === 1 ? '' : 's'})`);
+        return;
+      }
+      const originalOrder = stagedSongs.map(s => s.uri).join(',');
+      let attempts = 0;
+      do {
+        for (let i = stagedSongs.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [stagedSongs[i], stagedSongs[j]] = [stagedSongs[j], stagedSongs[i]];
+        }
+        attempts++;
+      } while (attempts < 5 && stagedSongs.length > 1 && stagedSongs.map(s => s.uri).join(',') === originalOrder);
+
+      updateSendBoxUI();
+      showToast(`🔀 Shuffled all ${stagedSongs.length} songs into a new mixed order!`);
+    }
+
+    function removeStagedItem(uri) {
+      const idx = stagedSongs.findIndex(s => s.uri === uri);
+      if (idx > -1) {
+        const item = stagedSongs[idx];
+        stagedSongs.splice(idx, 1);
+        updateSendBoxUI();
+        refreshButtonsState();
+        showToast(`Removed "${item.name}"`);
+      }
+    }
+
+    function clearSendBox() {
+      if (stagedSongs.length === 0) return;
+      stagedSongs = [];
+      updateSendBoxUI();
+      refreshButtonsState();
+      showToast('Cleared Send Box');
+    }
+
+    function refreshButtonsState() {
+      if (currentMode === 'movies' || currentMode === 'actors') {
+        activeItems.forEach((m, mIdx) => {
+          if (m.tracks) {
+            m.tracks.forEach((t, tIdx) => {
+              const btn = document.getElementById(`btn-movie-${mIdx}-${tIdx}`);
+              if (btn) {
+                const isStaged = stagedSongs.some(s => s.uri === t.uri);
+                btn.className = isStaged ? 'add-song-btn added' : 'add-song-btn';
+                btn.innerHTML = isStaged ? '✓ Added' : '+ Send';
+              }
+            });
+          }
+        });
+      } else if (currentMode === 'singers') {
+        activeItems.forEach((s, sIdx) => {
+          const btn = document.getElementById(`btn-singer-${sIdx}`);
+          if (btn) {
+            const isStaged = stagedSongs.some(item => item.uri === s.uri);
+            btn.className = isStaged ? 'add-song-btn added' : 'add-song-btn';
+            btn.innerHTML = isStaged ? '✓ Added' : '+ Send';
+          }
+        });
+      } else {
+        activeItems.forEach((s, sIdx) => {
+          const btn = document.getElementById(`btn-song-${sIdx}`);
+          if (btn) {
+            const isStaged = stagedSongs.some(item => item.uri === s.uri);
+            btn.className = isStaged ? 'add-song-btn added' : 'add-song-btn';
+            btn.innerHTML = isStaged ? '✓ Added' : '+ Send';
+          }
+        });
+      }
+    }
+
+    function updateSendBoxUI() {
+      const countEl = document.getElementById('stagedCount');
+      const listEl = document.getElementById('stagedList');
+      const createBtn = document.getElementById('createPlaylistBtn');
+      const createBtnText = document.getElementById('createPlaylistBtnText');
+      const queueBtn = document.getElementById('queueBtn');
+      const appendBtn = document.getElementById('appendPlaylistBtn');
+      const playlistSelect = document.getElementById('userPlaylistsSelect');
+
+      countEl.textContent = stagedSongs.length;
+      if (createBtnText) {
+        createBtnText.textContent = `Create Spotify Playlist (${stagedSongs.length} Songs)`;
+      }
+
+      if (stagedSongs.length === 0) {
+        listEl.innerHTML = `
+          <div class="staged-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+            <span>No songs in Send Box yet. Click <strong>+ Send</strong> on any song to stage it here.</span>
+          </div>
+        `;
+        createBtn.disabled = true;
+        queueBtn.disabled = true;
+        if (appendBtn) appendBtn.disabled = true;
+      } else {
+        createBtn.disabled = false;
+        queueBtn.disabled = false;
+        if (appendBtn) appendBtn.disabled = !playlistSelect.value;
+
+        listEl.innerHTML = stagedSongs.map(s => `
+          <div class="staged-item">
+            <div class="staged-info">
+              <div class="staged-title" title="${escapeHtml(s.name)}">${escapeHtml(s.name)}</div>
+              <div class="staged-meta">
+                <span>${escapeHtml(s.artist)}</span>
+                <span class="source-movie-tag">${escapeHtml(s.movie)}</span>
+              </div>
+            </div>
+            <button class="remove-staged-btn" onclick="removeStagedItem('${s.uri}')" title="Remove song">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        `).join('');
+      }
+    }
+
+    async function createSpotifyPlaylist() {
+      if (stagedSongs.length === 0) return;
+      const btn = document.getElementById('createPlaylistBtn');
+      const nameInput = document.getElementById('playlistNameInput');
+      const descInput = document.getElementById('playlistDescInput');
+      const publicCheck = document.getElementById('playlistPublicCheck');
+      const playlistName = nameInput.value.trim() || 'Curated Soundtracks';
+
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span>Creating Playlist...</span>';
+      btn.disabled = true;
+
+      try {
+        const uris = stagedSongs.map(s => s.uri).filter(Boolean);
+        const res = await fetch('/api/playlist/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: playlistName,
+            description: descInput ? descInput.value.trim() : 'Curated with Soundtrack Curator Studio.',
+            public: publicCheck ? publicCheck.checked : false,
+            track_uris: uris
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          const count = data.song_count || data.track_count || uris.length;
+          showToast(`Playlist "${data.playlist_name}" created with ${count} songs!`, false, data.playlist_url);
+          loadUserPlaylists(true);
+
+          // Update direct link
+          const link = document.getElementById('spotifyDirectLink');
+          const linkText = document.getElementById('spotifyDirectLinkText');
+          if (link && data.playlist_url) {
+            link.href = data.playlist_url;
+            if (linkText) linkText.textContent = `Open "${data.playlist_name}" ↗`;
+          }
+        } else if (data.need_auth) {
+          showToast(data.error || 'Spotify authorization required.', true);
+          openAuthHelperModal(data.auth_url);
+        } else {
+          showToast(`Error creating playlist: ${data.error}`, true);
+        }
+      } catch (err) {
+        showToast(`Failed: ${err.message}`, true);
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    async function appendToSelectedPlaylist() {
+      if (stagedSongs.length === 0) return;
+      const select = document.getElementById('userPlaylistsSelect');
+      const playlistId = select.value;
+      if (!playlistId) {
+        showToast('Please select a playlist first.', true);
+        return;
+      }
+      const selectedName = select.options[select.selectedIndex].text;
+      const btn = document.getElementById('appendPlaylistBtn');
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
+
+      try {
+        const uris = stagedSongs.map(s => s.uri).filter(Boolean);
+        const res = await fetch('/api/playlist/append', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            playlist_id: playlistId,
+            track_uris: uris
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          const count = data.song_count || data.added_count || uris.length;
+          showToast(`Added ${count} songs to "${selectedName}"!`);
+          loadUserPlaylists(true);
+        } else if (data.need_auth) {
+          showToast(data.error || 'Spotify authorization required.', true);
+          openAuthHelperModal(data.auth_url);
+        } else {
+          showToast(`Error adding songs: ${data.error}`, true);
+        }
+      } catch (err) {
+        showToast(`Error: ${err.message}`, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '➕ Add Songs';
+      }
+    }
+
+    async function loadUserPlaylists(forceReload = false) {
+      if (userPlaylistsCache.length > 0 && !forceReload) {
+        populateUserPlaylistsUI(userPlaylistsCache);
+        return;
+      }
+      try {
+        const res = await fetch('/api/user/playlists');
+        const data = await res.json();
+        if (data.authenticated && Array.isArray(data.playlists) && data.playlists.length > 0) {
+          userPlaylistsCache = data.playlists;
+          populateUserPlaylistsUI(data.playlists);
+        } else if (data.need_scope) {
+          currentAuthUrl = data.auth_url;
+          const select = document.getElementById('userPlaylistsSelect');
+          if (select) {
+            select.innerHTML = '<option value="">⚠️ Grant Playlist Access to choose your playlists</option>';
+            select.onchange = () => openAuthHelperModal(data.auth_url);
+          }
+          const list = document.getElementById('myPlaylistsList');
+          if (list) {
+            list.innerHTML = `
+              <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                <span>Spotify requires permission to read your private and saved playlists.</span>
+                <button class="action-btn-primary" onclick="openAuthHelperModal('${escapeHtml(data.auth_url)}')">
+                  Grant Playlist Access ↗
+                </button>
+              </div>
+            `;
+          }
+        } else {
+          const list = document.getElementById('myPlaylistsList');
+          if (list) {
+            list.innerHTML = `
+              <div style="text-align: center; padding: 24px; color: var(--text-dim); font-size: 13px;">
+                ${data.authenticated ? 'No playlists found on your Spotify account.' : 'Connect your Spotify account to view your playlists.'}
+              </div>
+            `;
+          }
+        }
+      } catch (e) {
+        console.warn('Could not load user playlists:', e);
+      }
+    }
+
+    function populateUserPlaylistsUI(playlists) {
+      // 1. Send Box Dropdown
+      const select = document.getElementById('userPlaylistsSelect');
+      if (select) {
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">-- Choose Your Playlist --</option>' + 
+          playlists.map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)} (${p.total_tracks} songs)</option>`).join('');
+        if (currentVal) select.value = currentVal;
+        select.onchange = () => {
+          document.getElementById('appendPlaylistBtn').disabled = !select.value || stagedSongs.length === 0;
+        };
+      }
+
+      // 2. Modal My Playlists Tab
+      const list = document.getElementById('myPlaylistsList');
+      if (list) {
+        if (playlists.length === 0) {
+          list.innerHTML = `<div style="text-align: center; padding: 24px; color: var(--text-dim); font-size: 13px;">No playlists found on your account.</div>`;
+          return;
+        }
+        list.innerHTML = playlists.map(p => `
+          <div class="playlist-card-row">
+            <img src="${p.cover_url || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100'}" class="playlist-thumb" alt="${escapeHtml(p.name)}" />
+            <div class="playlist-meta">
+              <div class="playlist-row-title">${escapeHtml(p.name)}</div>
+              <div class="playlist-row-sub">${p.total_tracks} songs • By ${escapeHtml(p.owner)}</div>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="add-song-btn" onclick="fetchAndStagePlaylist('${escapeHtml(p.id)}')" title="Import all songs into Send Box">
+                📥 Stage All
+              </button>
+              <button class="action-btn-secondary" onclick="fetchAndViewPlaylist('${escapeHtml(p.id)}')" style="font-size: 11px; padding: 4px 8px;" title="View songs in main results">
+                👁️ View
+              </button>
+              <button class="action-btn-secondary" onclick="shuffleExistingPlaylist('${escapeHtml(p.id)}')" style="font-size: 11px; padding: 4px 8px; color: #38bdf8;" title="Mix all songs in this playlist in a new order">
+                🔀 Shuffle
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function openFetchPlaylistModal() {
+      document.getElementById('fetchPlaylistModal').classList.add('active');
+      loadUserPlaylists();
+    }
+
+    function closeFetchPlaylistModal() {
+      document.getElementById('fetchPlaylistModal').classList.remove('active');
+    }
+
+    function switchFetchTab(tab) {
+      const tabUrl = document.getElementById('tabFetchUrl');
+      const tabMine = document.getElementById('tabFetchMine');
+      const contentUrl = document.getElementById('fetchTabUrlContent');
+      const contentMine = document.getElementById('fetchTabMineContent');
+
+      if (tab === 'url') {
+        tabUrl.classList.add('active');
+        tabMine.classList.remove('active');
+        contentUrl.style.display = 'flex';
+        contentMine.style.display = 'none';
+      } else {
+        tabMine.classList.add('active');
+        tabUrl.classList.remove('active');
+        contentMine.style.display = 'flex';
+        contentUrl.style.display = 'none';
+        loadUserPlaylists();
+      }
+    }
+
+    let lastFetchedPlaylistData = null;
+
+    async function fetchPlaylistByUrl(queryOverride = null) {
+      const input = document.getElementById('fetchUrlInput');
+      const query = queryOverride || input.value.trim();
+      if (!query) {
+        showToast('Please enter a Spotify playlist link or ID.', true);
+        return;
+      }
+      const btn = document.getElementById('fetchUrlBtn');
+      btn.disabled = true;
+      btn.textContent = 'Fetching...';
+
+      const preview = document.getElementById('fetchedPlaylistPreview');
+      preview.style.display = 'flex';
+      preview.innerHTML = `<div class="skeleton" style="height: 120px; border-radius: 12px;"></div>`;
+
+      try {
+        const res = await fetch(`/api/playlist/fetch?query=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        if (data.success && data.playlist) {
+          lastFetchedPlaylistData = data;
+          renderFetchedPlaylistPreview(data.playlist, data.tracks);
+        } else {
+          preview.innerHTML = `<div style="color: #ef4444; font-size: 13px; padding: 12px; background: rgba(239, 68, 68, 0.1); border-radius: 8px;">⚠️ ${escapeHtml(data.error || 'Could not fetch playlist.')}</div>`;
+        }
+      } catch (err) {
+        preview.innerHTML = `<div style="color: #ef4444; font-size: 13px; padding: 12px;">Error: ${escapeHtml(err.message)}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Fetch Songs';
+      }
+    }
+
+    // Shuffle an existing Spotify playlist live using the shuffle API
+    async function shuffleExistingPlaylist(playlistId) {
+      if (!playlistId) return;
+      showToast('🔀 Mixing and shuffling playlist songs...', false);
+      try {
+        const res = await fetch('/api/playlist/shuffle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ playlist_id: playlistId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`🔀 Successfully mixed ${data.song_count} songs in a new random order!`);
+          if (lastFetchedPlaylistData && lastFetchedPlaylistData.playlist && (lastFetchedPlaylistData.playlist.id === playlistId || lastFetchedPlaylistData.playlist.id === data.playlist_id)) {
+            lastFetchedPlaylistData.tracks = data.tracks || lastFetchedPlaylistData.tracks;
+            renderFetchedPlaylistPreview(lastFetchedPlaylistData.playlist, lastFetchedPlaylistData.tracks);
+          }
+          loadUserPlaylists(true);
+        } else if (data.need_auth) {
+          showToast(data.error || 'Spotify authorization required.', true);
+          openAuthHelperModal(data.auth_url);
+        } else {
+          showToast(`Shuffle error: ${data.error}`, true);
+        }
+      } catch (err) {
+        showToast(`Error shuffling playlist: ${err.message}`, true);
+      }
+    }
+
+    function renderFetchedPlaylistPreview(pl, tracks) {
+      const preview = document.getElementById('fetchedPlaylistPreview');
+      preview.innerHTML = `
+        <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; gap: 14px; align-items: center;">
+            <img src="${pl.cover_url || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120'}" style="width: 64px; height: 64px; border-radius: 8px; object-fit: cover;" />
+            <div style="min-width: 0; flex: 1;">
+              <h4 style="font-size: 16px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(pl.name)}</h4>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">By ${escapeHtml(pl.owner)} • ${tracks.length} songs fetched</p>
+              ${pl.description ? `<p style="font-size: 11px; color: var(--text-dim); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(pl.description)}</p>` : ''}
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="action-btn-primary" onclick="stageAllFetchedTracks()" style="flex: 1; padding: 9px 12px; font-size: 13px; min-width: 140px;">
+              📥 Stage All ${tracks.length} Songs into Send Box
+            </button>
+            <button class="action-btn-secondary" onclick="viewFetchedTracksInMainTimeline()" style="padding: 9px 12px; font-size: 13px;">
+              👁️ View as Results
+            </button>
+          </div>
+
+          <div style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 10px;">
+            ${tracks.map((t, idx) => `
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 10px; background: rgba(255, 255, 255, 0.02); border-radius: 6px; font-size: 12px;">
+                <div style="min-width: 0; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  <strong style="color: #fff;">${idx+1}. ${escapeHtml(t.name)}</strong> - <span style="color: var(--text-muted);">${escapeHtml(t.artist)}</span>
+                </div>
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <button class="play-song-btn" onclick="playSong('${escapeHtml(t.uri)}')" title="Play on active Spotify device">▶</button>
+                  <button class="add-song-btn" onclick="stageSingleFetchedTrack(${idx})" style="padding: 2px 8px; font-size: 11px;">
+                    + Add
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function stageAllFetchedTracks() {
+      if (!lastFetchedPlaylistData || !lastFetchedPlaylistData.tracks) return;
+      let added = 0;
+      lastFetchedPlaylistData.tracks.forEach(t => {
+        if (!stagedSongs.some(s => s.uri === t.uri)) {
+          stagedSongs.push({
+            name: t.name,
+            artist: t.artist,
+            uri: t.uri,
+            album_cover: t.album_cover,
+            movie: lastFetchedPlaylistData.playlist.name
+          });
+          added++;
+        }
+      });
+      updateSendBoxUI();
+      refreshButtonsState();
+      showToast(`Staged ${added} songs from "${lastFetchedPlaylistData.playlist.name}" into Send Box!`);
+      closeFetchPlaylistModal();
+    }
+
+    function stageSingleFetchedTrack(idx) {
+      if (!lastFetchedPlaylistData || !lastFetchedPlaylistData.tracks[idx]) return;
+      const t = lastFetchedPlaylistData.tracks[idx];
+      if (!stagedSongs.some(s => s.uri === t.uri)) {
+        stagedSongs.push({
+          name: t.name,
+          artist: t.artist,
+          uri: t.uri,
+          album_cover: t.album_cover,
+          movie: lastFetchedPlaylistData.playlist.name
+        });
+        updateSendBoxUI();
+        refreshButtonsState();
+        showToast(`Added "${t.name}" to Send Box!`, false, null, t.uri);
+      } else {
+        showToast(`Song "${t.name}" already in Send Box.`);
+      }
+    }
+
+    function viewFetchedTracksInMainTimeline() {
+      if (!lastFetchedPlaylistData || !lastFetchedPlaylistData.tracks) return;
+      switchMode('songs');
+      activeItems = lastFetchedPlaylistData.tracks;
+      currentArtist = null;
+      document.getElementById('timelineTitle').innerHTML = `
+        ${escapeHtml(lastFetchedPlaylistData.playlist.name)}
+        <span class="timeline-badge">${activeItems.length} Songs</span>
+      `;
+      renderSongs();
+      closeFetchPlaylistModal();
+      showToast(`Displaying ${activeItems.length} songs from playlist!`);
+    }
+
+    async function fetchAndStagePlaylist(playlistId) {
+      switchFetchTab('url');
+      document.getElementById('fetchUrlInput').value = playlistId;
+      await fetchPlaylistByUrl(playlistId);
+    }
+
+    async function fetchAndViewPlaylist(playlistId) {
+      switchFetchTab('url');
+      document.getElementById('fetchUrlInput').value = playlistId;
+      await fetchPlaylistByUrl(playlistId);
+      if (lastFetchedPlaylistData) {
+        viewFetchedTracksInMainTimeline();
+      }
+    }
+
+    function openAuthHelperModal(url) {
+      const modal = document.getElementById('authHelperModal');
+      const link = document.getElementById('authHelperLink');
+      const targetUrl = url || currentAuthUrl || '/login';
+      link.href = targetUrl;
+      modal.classList.add('active');
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    function closeAuthHelperModal() {
+      document.getElementById('authHelperModal').classList.remove('active');
+    }
+
+    async function submitManualOAuthCode() {
+      const input = document.getElementById('authCodeInput');
+      const codeOrUrl = input.value.trim();
+      if (!codeOrUrl) {
+        showToast('Please paste the redirect URL or code.', true);
+        return;
+      }
+      const btn = document.getElementById('submitAuthCodeBtn');
+      btn.disabled = true;
+      btn.textContent = 'Connecting...';
+
+      try {
+        const res = await fetch('/api/auth/exchange_code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code_or_url: codeOrUrl })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Successfully connected as ${data.display_name}! 🎉`);
+          closeAuthHelperModal();
+          checkUserProfile();
+          loadUserPlaylists(true);
+        } else {
+          showToast(`Auth error: ${data.error || 'Failed to validate code'}`, true);
+        }
+      } catch (err) {
+        showToast(`Error: ${err.message}`, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Connect';
+      }
+    }
+
+    async function queueSpotifyTracks() {
+      if (stagedSongs.length === 0) return;
+      const btn = document.getElementById('queueBtn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span>Queueing...</span>';
+      btn.disabled = true;
+
+      try {
+        const uris = stagedSongs.map(s => s.uri).filter(Boolean);
+        const res = await fetch('/api/player/queue', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ track_uris: uris })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Sent ${data.queued} songs to your Spotify playback queue!`);
+        } else {
+          showToast(`Queue issue: Make sure Spotify is active on your device (${data.error || 'No active player'})`, true);
+        }
+      } catch (err) {
+        showToast(`Failed to queue: ${err.message}`, true);
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    // Popup notification with built-in Remove option and direct link
+    function showToast(message, isError = false, actionUrl = null, trackUri = null) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${isError ? 'error' : ''}`;
+      
+      let linkHtml = '';
+      if (actionUrl) {
+        linkHtml = `<a href="${actionUrl}" target="_blank" rel="noopener noreferrer" class="toast-link">Open in Spotify ↗</a>`;
+      }
+
+      let removeBtnHtml = '';
+
+      toast.innerHTML = `
+        <span>${isError ? '⚠️' : '✅'}</span>
+        <span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(message)}</span>
+        ${linkHtml}
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
